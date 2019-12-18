@@ -31,6 +31,8 @@ namespace BookSite.Models
         public DbSet<Collection> Collections { get; set; }
         public DbSet<CollectionBooks> CollectionBooks { get; set; }
         public DbSet<BookDiscussions> BookDiscussions { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<BookAuthors> BookAuthors { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

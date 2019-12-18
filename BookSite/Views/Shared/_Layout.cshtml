@@ -22,9 +22,11 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                 </ul>
+                <form class="form-inline">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search..." id="searchInput">
+                    <button class="btn btn-success" id="searchBtn">Search</button>
+                </form>
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
@@ -42,3 +44,8 @@
     @RenderSection("scripts", required: false)
 </body>
 </html>
+<script>
+    $(document).on("click", "#searchBtn", function () {
+
+    })
+</script>

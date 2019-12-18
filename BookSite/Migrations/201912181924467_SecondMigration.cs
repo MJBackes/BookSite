@@ -3,7 +3,7 @@ namespace BookSite.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class InitialMigrataion : DbMigration
+    public partial class SecondMigration : DbMigration
     {
         public override void Up()
         {
@@ -13,6 +13,32 @@ namespace BookSite.Migrations
                     {
                         Id = c.Guid(nullable: false),
                         Name = c.String(),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.BookAuthors",
+                c => new
+                    {
+                        Id = c.Guid(nullable: false),
+                        BookId = c.Guid(nullable: false),
+                        AuthorId = c.Guid(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Authors", t => t.AuthorId, cascadeDelete: true)
+                .ForeignKey("dbo.Books", t => t.BookId, cascadeDelete: true)
+                .Index(t => t.BookId)
+                .Index(t => t.AuthorId);
+            
+            CreateTable(
+                "dbo.Books",
+                c => new
+                    {
+                        Id = c.Guid(nullable: false),
+                        Title = c.String(),
+                        ISBN = c.String(),
+                        GoogleETag = c.String(),
+                        PageCount = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -29,20 +55,6 @@ namespace BookSite.Migrations
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Books", t => t.NextBookId)
                 .Index(t => t.NextBookId);
-            
-            CreateTable(
-                "dbo.Books",
-                c => new
-                    {
-                        Id = c.Guid(nullable: false),
-                        Title = c.String(),
-                        ISBN = c.String(),
-                        PageCount = c.Int(nullable: false),
-                        AuthorId = c.Guid(),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Authors", t => t.AuthorId)
-                .Index(t => t.AuthorId);
             
             CreateTable(
                 "dbo.BookDiscussions",
@@ -93,7 +105,7 @@ namespace BookSite.Migrations
                         Id = c.Guid(nullable: false),
                         FirstName = c.String(),
                         LastNme = c.String(),
-                        DisplayName = c.String(),
+                        DisplayName = c.String(nullable: false),
                         UserImage = c.String(),
                         ApplicationUserId = c.String(maxLength: 128),
                     })
@@ -205,6 +217,23 @@ namespace BookSite.Migrations
                 .Index(t => t.MemberId);
             
             CreateTable(
+                "dbo.Reviews",
+                c => new
+                    {
+                        Id = c.Guid(nullable: false),
+                        BookId = c.Guid(nullable: false),
+                        MemberId = c.Guid(nullable: false),
+                        Title = c.String(),
+                        Rating = c.Int(nullable: false),
+                        Body = c.String(),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Books", t => t.BookId, cascadeDelete: true)
+                .ForeignKey("dbo.Members", t => t.MemberId, cascadeDelete: true)
+                .Index(t => t.BookId)
+                .Index(t => t.MemberId);
+            
+            CreateTable(
                 "dbo.AspNetRoles",
                 c => new
                     {
@@ -219,6 +248,8 @@ namespace BookSite.Migrations
         public override void Down()
         {
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
+            DropForeignKey("dbo.Reviews", "MemberId", "dbo.Members");
+            DropForeignKey("dbo.Reviews", "BookId", "dbo.Books");
             DropForeignKey("dbo.Comments", "MemberId", "dbo.Members");
             DropForeignKey("dbo.Comments", "DiscussionId", "dbo.Discussions");
             DropForeignKey("dbo.Comments", "BookId", "dbo.Books");
@@ -235,8 +266,11 @@ namespace BookSite.Migrations
             DropForeignKey("dbo.Discussions", "ClubId", "dbo.BookClubs");
             DropForeignKey("dbo.BookDiscussions", "BookId", "dbo.Books");
             DropForeignKey("dbo.BookClubs", "NextBookId", "dbo.Books");
-            DropForeignKey("dbo.Books", "AuthorId", "dbo.Authors");
+            DropForeignKey("dbo.BookAuthors", "BookId", "dbo.Books");
+            DropForeignKey("dbo.BookAuthors", "AuthorId", "dbo.Authors");
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
+            DropIndex("dbo.Reviews", new[] { "MemberId" });
+            DropIndex("dbo.Reviews", new[] { "BookId" });
             DropIndex("dbo.Comments", new[] { "MemberId" });
             DropIndex("dbo.Comments", new[] { "BookId" });
             DropIndex("dbo.Comments", new[] { "DiscussionId" });
@@ -254,9 +288,11 @@ namespace BookSite.Migrations
             DropIndex("dbo.Discussions", new[] { "ClubId" });
             DropIndex("dbo.BookDiscussions", new[] { "DiscussionId" });
             DropIndex("dbo.BookDiscussions", new[] { "BookId" });
-            DropIndex("dbo.Books", new[] { "AuthorId" });
             DropIndex("dbo.BookClubs", new[] { "NextBookId" });
+            DropIndex("dbo.BookAuthors", new[] { "AuthorId" });
+            DropIndex("dbo.BookAuthors", new[] { "BookId" });
             DropTable("dbo.AspNetRoles");
+            DropTable("dbo.Reviews");
             DropTable("dbo.Comments");
             DropTable("dbo.Collections");
             DropTable("dbo.CollectionBooks");
@@ -268,8 +304,9 @@ namespace BookSite.Migrations
             DropTable("dbo.ClubMembers");
             DropTable("dbo.Discussions");
             DropTable("dbo.BookDiscussions");
-            DropTable("dbo.Books");
             DropTable("dbo.BookClubs");
+            DropTable("dbo.Books");
+            DropTable("dbo.BookAuthors");
             DropTable("dbo.Authors");
         }
     }

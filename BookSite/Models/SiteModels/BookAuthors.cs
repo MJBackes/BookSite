@@ -7,13 +7,15 @@ using System.Web;
 
 namespace BookSite.Models.SiteModels
 {
-    public class Book
+    public class BookAuthors
     {
         [Key]
         public Guid Id { get; set; }
-        public string Title { get; set; }
-        public string ISBN { get; set; }
-        public string GoogleETag { get; set; }
-        public int PageCount { get; set; }
+        [ForeignKey("Book")]
+        public Guid BookId { get; set; }
+        public Book Book { get; set; }
+        [ForeignKey("Author")]
+        public Guid AuthorId { get; set; }
+        public Author Author { get; set; }
     }
 }

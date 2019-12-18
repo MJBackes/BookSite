@@ -11,8 +11,12 @@ namespace BookSite.Models.SiteModels
     {
         [Key]
         public Guid Id { get; set; }
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
-        public string LastNme { get; set; }
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
+        [Required]
+        [Display(Name = "Display Name")]
         public string DisplayName { get; set; }
         public string UserImage { get; set; }
         [ForeignKey("ApplicationUser")]

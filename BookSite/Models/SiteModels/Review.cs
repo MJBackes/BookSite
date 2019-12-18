@@ -7,13 +7,18 @@ using System.Web;
 
 namespace BookSite.Models.SiteModels
 {
-    public class Book
+    public class Review
     {
         [Key]
         public Guid Id { get; set; }
+        [ForeignKey("Book")]
+        public Guid BookId { get; set; }
+        public Book Book { get; set; }
+        [ForeignKey("Member")]
+        public Guid MemberId { get; set; }
+        public Member Member { get; set; }
         public string Title { get; set; }
-        public string ISBN { get; set; }
-        public string GoogleETag { get; set; }
-        public int PageCount { get; set; }
+        public int Rating { get; set; }
+        public string Body { get; set; }
     }
 }
