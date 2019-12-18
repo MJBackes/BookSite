@@ -15,7 +15,7 @@ namespace BookSite.Models.SiteModels
         public string ISBN { get; set; }
         public int PageCount { get; set; }
         [ForeignKey("Author")]
-        public Guid AuthorId { get; set; }
+        public Guid? AuthorId { get; set; }
         public Author Author { get; set; }
     }
 }

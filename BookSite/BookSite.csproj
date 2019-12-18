@@ -170,15 +170,22 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\SiteControllers\MemberController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912181643553_InitialMigrataion.cs" />
+    <Compile Include="Migrations\201912181643553_InitialMigrataion.Designer.cs">
+      <DependentUpon>201912181643553_InitialMigrataion.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\SiteModels\Author.cs" />
     <Compile Include="Models\SiteModels\Book.cs" />
     <Compile Include="Models\SiteModels\BookClub.cs" />
+    <Compile Include="Models\SiteModels\BookDiscussions.cs" />
     <Compile Include="Models\SiteModels\ClubMembers.cs" />
     <Compile Include="Models\SiteModels\Collection.cs" />
     <Compile Include="Models\SiteModels\CollectionBooks.cs" />
@@ -247,6 +254,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Member\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -260,6 +268,11 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201912181643553_InitialMigrataion.resx">
+      <DependentUpon>201912181643553_InitialMigrataion.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

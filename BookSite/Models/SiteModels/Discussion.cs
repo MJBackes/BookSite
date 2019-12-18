@@ -12,9 +12,7 @@ namespace BookSite.Models.SiteModels
         [Key]
         public Guid Id { get; set; }
         public string Name { get; set; }
-        [ForeignKey("Book")]
-        public Guid BookId { get; set; }
-        public Book Book { get; set; }
+
         [ForeignKey("BookClub")]
         public Guid ClubId { get; set; }
         public BookClub BookClub { get; set; }

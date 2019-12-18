@@ -9,6 +9,8 @@ namespace BookSite.Models.SiteModels
 {
     public class ClubMembers
     {
+        [Key]
+        public Guid Id { get; set; }
         [ForeignKey("Club")]
         public Guid ClubId { get; set; }
         public BookClub Club { get; set; }

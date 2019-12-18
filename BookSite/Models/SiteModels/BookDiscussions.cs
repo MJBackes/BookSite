@@ -7,15 +7,15 @@ using System.Web;
 
 namespace BookSite.Models.SiteModels
 {
-    public class BookClub
+    public class BookDiscussions
     {
         [Key]
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string PrivacyLevel { get; set; }
-        public string Description { get; set; }
-        [ForeignKey("NextBook")]
-        public Guid? NextBookId { get; set; }
-        public Book NextBook { get; set; }
+        [ForeignKey("Book")]
+        public Guid? BookId { get; set; }
+        public Book Book { get; set; }
+        [ForeignKey("Discussion")]
+        public Guid? DiscussionId { get; set; }
+        public Discussion Discussion { get; set; }
     }
 }
