@@ -1,6 +1,12 @@
-﻿using System;
+﻿using BookSite.APIHandlers;
+using BookSite.Models;
+using BookSite.Models.APIResponseModels;
+using BookSite.Models.MiscModels;
+using BookSite.Models.SiteModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -8,6 +14,11 @@ namespace BookSite.Controllers.SiteControllers
 {
     public class BookController : Controller
     {
+        private ApplicationDbContext db;
+        public BookController()
+        {
+            db = new ApplicationDbContext();
+        }
         // GET: Book
         public ActionResult Index()
         {
@@ -15,76 +26,14 @@ namespace BookSite.Controllers.SiteControllers
         }
 
         // GET: Book/Details/5
-        public ActionResult Details(int id)
+        [HttpGet]
+        public ActionResult Details(string id)
         {
-            return View();
+            Book book = ParseSingleSearchResponse(GoogleBooksAPIHandler.SingleSearch(id).Result);
+            ViewBag.Reviews = db.Reviews.Where(r => r.BookId == book.Id).ToList();
+            return View(book);
         }
 
-        // GET: Book/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Book/Create
-        [HttpPost]
-        public ActionResult Create(FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Book/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Book/Edit/5
-        [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Book/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: Book/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
         [HttpGet]
         public ActionResult NavBarSearch()
         {
@@ -93,7 +42,133 @@ namespace BookSite.Controllers.SiteControllers
         [HttpPost]
         public ActionResult NavBarSearch(string input)
         {
+            GoogleBooksSearchResponse response = GoogleBooksAPIHandler.NavBarSearch(input);
+            return View(ParseSearchResponse(response));
+        }
+        [HttpGet]
+        public ActionResult SearchResults(Search search)
+        {
+            GoogleBooksSearchResponse response = GoogleBooksAPIHandler.FullSearch(search);
+            return View(ParseSearchResponse(response));
+        }
+        [HttpGet]
+        public ActionResult Search()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Search(Search search)
+        {
+            return RedirectToAction("SearchResults", search);
+        }
 
+        //Private Methods
+        private Book ParseSingleSearchResponse(GoogleBookSingleResponse response)
+        {
+            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == response.id);
+            if (book != null)
+            {
+                book.Authors = GetAuthorString(response.volumeInfo.authors);
+                book.Categories = GetCategoryString(response.volumeInfo.categories);
+                return book;
+            }
+            else
+            {
+                return AddNewSingleBook(response);
+            }
+        }
+        private Book AddNewSingleBook(GoogleBookSingleResponse response)
+        {
+            Book book = new Book()
+            {
+                Id = Guid.NewGuid(),
+                GoogleVolumeId = response.id,
+                Description = response.volumeInfo.description,
+                Title = response.volumeInfo.title,
+                PageCount = response.volumeInfo.pageCount,
+                Thumbnail = response.volumeInfo.imageLinks == null ? null : response.volumeInfo.imageLinks.thumbnail
+            };
+            book.Authors = GetAuthorString(response.volumeInfo.authors);
+            book.Categories = GetCategoryString(response.volumeInfo.categories);
+            db.Books.Add(book);
+            db.SaveChanges();
+            return book;
+        }
+        private List<Book> ParseSearchResponse(GoogleBooksSearchResponse response)
+        {
+            List<Book> output = new List<Book>();
+            foreach(Item item in response.items)
+            {
+                output.Add(ParseSearchItem(item));
+            }
+            return output;
+        }
+        private Book ParseSearchItem(Item item)
+        {
+            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == item.id);
+            if (book != null)
+            {
+                book.Authors = GetAuthorString(item.volumeInfo.authors);
+                book.Categories = GetCategoryString(item.volumeInfo.categories);
+                return book;
+            }
+            else
+            {
+                return AddNewVolumeBook(item);
+            }
+        }
+        private Book AddNewVolumeBook(Item item)
+        {
+            Book book = new Book()
+            {
+                Id = Guid.NewGuid(),
+                GoogleVolumeId = item.id,
+                Description = item.volumeInfo.description,
+                Title = item.volumeInfo.title,
+                PageCount = item.volumeInfo.pageCount,
+                Thumbnail = item.volumeInfo.imageLinks == null ? null : item.volumeInfo.imageLinks.thumbnail
+            };
+            book.Authors = GetAuthorString(item.volumeInfo.authors);
+            book.Categories = GetCategoryString(item.volumeInfo.categories);
+            db.Books.Add(book);
+            db.SaveChanges();
+            return book;
+        }
+        private string GetCategoryString(string[] categories)
+        {
+            StringBuilder output = new StringBuilder("");
+            if(categories != null)
+                for(int i = 0; i < categories.Length; i++)
+                {
+                    string categoryName = categories[i];
+                    if(db.GenreTags.FirstOrDefault(g => g.Name == categoryName) == null)
+                    {
+                        db.GenreTags.Add(new GenreTag { Id = Guid.NewGuid(), Name = categoryName });
+                        db.SaveChanges();
+                    }
+                    output.Append(categories[i]);
+                    if (i != categories.Length - 1)
+                        output.Append(",");
+                }
+            return output.ToString();
+        }
+        private string GetAuthorString(string[] authors)
+        {
+            StringBuilder output = new StringBuilder("");
+            if(authors != null)
+                for(int i = 0; i < authors.Length; i++)
+                {
+                    string authorName = authors[i];
+                    if (db.Authors.FirstOrDefault(a => a.Name == authorName) == null)
+                    {
+                        db.Authors.Add(new Author { Name = authorName, Id = Guid.NewGuid() });
+                        db.SaveChanges();
+                    }
+                    output.Append(authors[i]);
+                    if (i != authors.Length - 1)
+                        output.Append(",");
+                }
+            return output.ToString();
         }
     }
 }

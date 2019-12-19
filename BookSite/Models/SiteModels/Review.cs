@@ -18,7 +18,7 @@ namespace BookSite.Models.SiteModels
         public Guid MemberId { get; set; }
         public Member Member { get; set; }
         public string Title { get; set; }
-        public int Rating { get; set; }
+        public double Rating { get; set; }
         public string Body { get; set; }
     }
 }

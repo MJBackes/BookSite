@@ -1,0 +1,56 @@
+﻿@model List<BookSite.Models.SiteModels.Book>
+
+@{
+    ViewBag.Title = "SearchResults";
+}
+
+<h2>Search Results</h2>
+
+<table class="table-striped">
+    <tr>
+        <th class="col-md-2"></th>
+        <th class="col-md-2">
+            Title
+        </th>
+        <th class="col-md-2">
+            Authors
+        </th>
+        <th class="col-md-2">
+            Categories
+        </th>
+        <th class="col-md-3">
+            Description
+        </th>
+        <th class="col-md-1">
+            Page Count
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+<tr>
+    <td>
+        <img src="@item.Thumbnail" />
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Title)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Authors)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Categories)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Description)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.PageCount)
+    </td>
+    <td>
+        @Html.ActionLink("Details", "Details", new { id = item.GoogleVolumeId })
+    </td>
+</tr>
+}
+
+</table>

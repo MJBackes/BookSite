@@ -55,9 +55,9 @@ namespace BookSite.APIHandlers
                 }
             }
         }
-        public async static Task<GoogleBookSingleResponse> SingleSearch(string GoogleETag)
+        public async static Task<GoogleBookSingleResponse> SingleSearch(string GoogleVolumeId)
         {
-            string URI = "";
+            string URI = $"https://www.googleapis.com/books/v1/volumes/{GoogleVolumeId}";
             using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Accept.Clear();

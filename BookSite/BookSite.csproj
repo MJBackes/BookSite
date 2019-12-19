@@ -174,12 +174,13 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\SiteControllers\BookController.cs" />
     <Compile Include="Controllers\SiteControllers\MemberController.cs" />
+    <Compile Include="Controllers\SiteControllers\ReviewController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201912181924467_SecondMigration.cs" />
-    <Compile Include="Migrations\201912181924467_SecondMigration.Designer.cs">
-      <DependentUpon>201912181924467_SecondMigration.cs</DependentUpon>
+    <Compile Include="Migrations\201912191855328_SecondMigration.cs" />
+    <Compile Include="Migrations\201912191855328_SecondMigration.Designer.cs">
+      <DependentUpon>201912191855328_SecondMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -263,10 +264,14 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Member\Create.cshtml" />
     <Content Include="Views\Member\Index.cshtml" />
+    <Content Include="Views\Book\NavBarSearch.cshtml" />
+    <Content Include="Views\Book\SearchResults.cshtml" />
+    <Content Include="Views\Book\Search.cshtml" />
+    <Content Include="Views\Book\Details.cshtml" />
+    <Content Include="Views\Review\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Book\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -282,8 +287,8 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201912181924467_SecondMigration.resx">
-      <DependentUpon>201912181924467_SecondMigration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201912191855328_SecondMigration.resx">
+      <DependentUpon>201912191855328_SecondMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -33,6 +33,8 @@ namespace BookSite.Models
         public DbSet<BookDiscussions> BookDiscussions { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<BookAuthors> BookAuthors { get; set; }
+        public DbSet<GenreTag> GenreTags { get; set; }
+        public DbSet<BookTags> BookTags { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
