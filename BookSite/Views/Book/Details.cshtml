@@ -58,6 +58,7 @@
         </dd>
 
     </dl>
+    @Html.ActionLink("Add to my Shelf", "AddBookToCollection","Member", new { id = Model.GoogleVolumeId}, new { @class="btn btn-primary"})
     <h3>Reviews</h3>
     <table class="table-striped">
         <tbody>
@@ -103,7 +104,7 @@
                 <td></td>
                 <td></td>
                 <td>
-                    Leave Review
+                    @Html.ActionLink("Leave a Review","Create","Review", new { id = Model.GoogleVolumeId }, new { @class="btn btn-primary"})
                 </td>
             </tr>
             </tbody>

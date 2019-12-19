@@ -97,14 +97,16 @@ namespace BookSite.Controllers.SiteControllers
             }
         }
         [HttpGet]
-        public ActionResult AddBookToCollection()
+        public ActionResult AddBookToCollection(string id)
         {
-            return View();
+            return View(db.Books.FirstOrDefault(b => b.GoogleVolumeId == id));
         }
         [HttpPost]
         public ActionResult AddBookToCollection(Book book)
         {
             var userId = User.Identity.GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
             Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == member.Id);
             if(collection == null)

@@ -30,7 +30,7 @@ namespace BookSite.Controllers.SiteControllers
         public ActionResult Details(string id)
         {
             Book book = ParseSingleSearchResponse(GoogleBooksAPIHandler.SingleSearch(id).Result);
-            ViewBag.Reviews = db.Reviews.Where(r => r.BookId == book.Id).ToList();
+            ViewBag.Reviews = db.Reviews.Include("Member").Where(r => r.BookId == book.Id).ToList();
             return View(book);
         }
 
@@ -89,7 +89,9 @@ namespace BookSite.Controllers.SiteControllers
                 Thumbnail = response.volumeInfo.imageLinks == null ? null : response.volumeInfo.imageLinks.thumbnail
             };
             book.Authors = GetAuthorString(response.volumeInfo.authors);
+            AddBookAuthorJunctionEntries(book, response.volumeInfo.authors);
             book.Categories = GetCategoryString(response.volumeInfo.categories);
+            AddBookTagJunctionEntries(book, response.volumeInfo.categories);
             db.Books.Add(book);
             db.SaveChanges();
             return book;
@@ -129,10 +131,31 @@ namespace BookSite.Controllers.SiteControllers
                 Thumbnail = item.volumeInfo.imageLinks == null ? null : item.volumeInfo.imageLinks.thumbnail
             };
             book.Authors = GetAuthorString(item.volumeInfo.authors);
+            AddBookAuthorJunctionEntries(book, item.volumeInfo.authors);
             book.Categories = GetCategoryString(item.volumeInfo.categories);
-            db.Books.Add(book);
-            db.SaveChanges();
+            AddBookTagJunctionEntries(book, item.volumeInfo.categories);
             return book;
+        }
+        private void AddBookAuthorJunctionEntries(Book book, string[] authors)
+        {
+            foreach(string s in authors)
+            {
+                Author author = db.Authors.FirstOrDefault(a => a.Name == s);
+                db.BookAuthors.Add(new BookAuthors { Id = Guid.NewGuid(), Author = author, Book = book });
+            }
+            db.SaveChanges();
+        }
+        private void AddBookTagJunctionEntries(Book book, string[] categories)
+        {
+            if (categories != null) 
+            { 
+                foreach (string s in categories)
+                    {
+                        GenreTag tag = db.GenreTags.FirstOrDefault(t => t.Name == s);
+                        db.BookTags.Add(new BookTags { Id = Guid.NewGuid(), BookId = book.Id, TagId = tag.Id });
+                    }
+            }
+            db.SaveChanges();
         }
         private string GetCategoryString(string[] categories)
         {
@@ -148,7 +171,7 @@ namespace BookSite.Controllers.SiteControllers
                     }
                     output.Append(categories[i]);
                     if (i != categories.Length - 1)
-                        output.Append(",");
+                        output.Append(" , ");
                 }
             return output.ToString();
         }
@@ -166,7 +189,7 @@ namespace BookSite.Controllers.SiteControllers
                     }
                     output.Append(authors[i]);
                     if (i != authors.Length - 1)
-                        output.Append(",");
+                        output.Append(" , ");
                 }
             return output.ToString();
         }

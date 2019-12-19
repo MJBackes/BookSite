@@ -4,13 +4,65 @@
     ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
+<h2>Leave a Review</h2>
 
-@using (Html.BeginForm()) 
+<h4>Book</h4>
+<hr />
+<dl class="dl-horizontal">
+    <dt class="col-md-2">
+    </dt>
+
+    <dd>
+        <img src="@ViewBag.Book.Thumbnail" />
+    </dd>
+
+    <dt class="col-md-2">
+        Title
+    </dt>
+
+    <dd>
+        @ViewBag.Book.Title
+    </dd>
+
+    <dt class="col-md-2">
+        Authors
+    </dt>
+
+    <dd>
+        @ViewBag.Book.Authors
+    </dd>
+
+    <dt class="col-md-2">
+        Categories
+    </dt>
+
+    <dd>
+        @ViewBag.Book.Categories
+    </dd>
+
+    <dt class="col-md-3">
+        Description
+    </dt>
+
+    <dd>
+        @ViewBag.Book.Description
+    </dd>
+
+    <dt class="col-md-1">
+        Page Count
+    </dt>
+
+    <dd>
+        @ViewBag.Book.PageCount
+    </dd>
+
+</dl>
+
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
+
+    <div class="form-horizontal" style="width:100%">
         <h4>Review</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -33,11 +85,11 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Body, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Body, new { htmlAttributes = new { @class = "form-control", style="height:50px; width:100%" } })
+                @Html.TextAreaFor(model => model.Body, new { @class = "form-control", rows = "5", cols = "175", style = "height:auto; width:auto" })
                 @Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
             </div>
         </div>
-
+        @Html.HiddenFor(model => model.BookId,new { @Value = ViewBag.Book.Id})
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Create" class="btn btn-default" />
