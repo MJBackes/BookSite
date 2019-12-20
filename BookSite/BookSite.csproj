@@ -269,6 +269,7 @@
     <Content Include="Views\Book\Search.cshtml" />
     <Content Include="Views\Book\Details.cshtml" />
     <Content Include="Views\Review\Create.cshtml" />
+    <Content Include="Views\Shared\BookDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
