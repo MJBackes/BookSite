@@ -17,5 +17,7 @@ namespace BookSite.Models.SiteModels
         [ForeignKey("NextBook")]
         public Guid? NextBookId { get; set; }
         public Book NextBook { get; set; }
+        [NotMapped]
+        public bool NameIsTaken { get; set; }
     }
 }

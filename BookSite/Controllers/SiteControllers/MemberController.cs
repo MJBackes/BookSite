@@ -4,6 +4,7 @@ using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -153,8 +154,64 @@ namespace BookSite.Controllers.SiteControllers
             List<CollectionBooks> collectionBooks = db.CollectionBooks.Where(cb => cb.CollectionId == collection.Id).ToList();
             List<Book> books = new List<Book>();
             foreach (CollectionBooks cb in collectionBooks)
-                books.Add(db.Books.Find(cb.BookId));
+            {
+                Book book = db.Books.Find(cb.BookId);
+                books.Add(GetBookWithAuthorAndCategory(book));
+            }
             return books;
+        }
+
+        private string GetCategoryString(GenreTag[] categories)
+        {
+            StringBuilder output = new StringBuilder("");
+            if (categories != null)
+                for (int i = 0; i < categories.Length; i++)
+                {
+                    output.Append(categories[i].Name);
+                    if (i != categories.Length - 1)
+                        output.Append(",");
+                }
+            return output.ToString();
+        }
+        private string GetAuthorString(Author[] authors)
+        {
+            StringBuilder output = new StringBuilder("");
+            if (authors != null)
+                for (int i = 0; i < authors.Length; i++)
+                {
+                    output.Append(authors[i].Name);
+                    if (i != authors.Length - 1)
+                        output.Append(",");
+                }
+            return output.ToString();
+        }
+        private Author[] GetAuthorArray(Book book)
+        {
+            List<BookAuthors> bookAuthors = db.BookAuthors.Where(a => a.BookId == book.Id).ToList();
+            Author[] authors = new Author[bookAuthors.Count];
+            for (int i = 0; i < bookAuthors.Count; i++)
+            {
+                Author author = db.Authors.Find(bookAuthors[i].AuthorId);
+                authors[i] = author;
+            }
+            return authors;
+        }
+        private GenreTag[] GetCategoryArray(Book book)
+        {
+            List<BookTags> bookTags = db.BookTags.Where(a => a.BookId == book.Id).ToList();
+            GenreTag[] tags = new GenreTag[bookTags.Count];
+            for (int i = 0; i < bookTags.Count; i++)
+            {
+                GenreTag tag = db.GenreTags.Find(bookTags[i].TagId);
+                tags[i] = tag;
+            }
+            return tags;
+        }
+        private Book GetBookWithAuthorAndCategory(Book book)
+        {
+            book.Categories = GetCategoryString(GetCategoryArray(book));
+            book.Authors = GetAuthorString(GetAuthorArray(book));
+            return book;
         }
     }
 }

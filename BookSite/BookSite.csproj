@@ -173,6 +173,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\SiteControllers\BookController.cs" />
+    <Compile Include="Controllers\SiteControllers\ClubController.cs" />
     <Compile Include="Controllers\SiteControllers\MemberController.cs" />
     <Compile Include="Controllers\SiteControllers\ReviewController.cs" />
     <Compile Include="Global.asax.cs">
@@ -274,6 +275,7 @@
     <Content Include="Views\Member\AddBookToCollection.cshtml" />
     <Content Include="Views\Member\RemoveBookFromCollection.cshtml" />
     <Content Include="Views\Member\MyShelf.cshtml" />
+    <Content Include="Views\Club\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
