@@ -1,0 +1,60 @@
+﻿@model IEnumerable<BookSite.Models.SiteModels.Book>
+
+@{
+    ViewBag.Title = "MyShelf";
+}
+
+<h2>MyShelf</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th class="col-md-2"></th>
+        <th class="col-md-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th class="col-md-2">
+            @Html.DisplayNameFor(model => model.Authors)
+        </th>
+        <th class="col-md-1">
+            @Html.DisplayNameFor(model => model.Categories)
+        </th>
+        <th class="col-md-3">
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th class="col-md-1">
+            @Html.DisplayNameFor(model => model.PageCount)
+        </th>
+        <th class="col-md-1"></th>
+    </tr>
+
+@foreach (var item in Model) {
+<tr>
+    <td>
+        <img src="@item.Thumbnail" />
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Title)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Authors)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Categories)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Description)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.PageCount)
+    </td>
+    <td>
+        @Html.ActionLink("Details", "Details","Book", new { id = item.GoogleVolumeId },new { @class="btn btn-primary", style="width:100%"})
+        @Html.ActionLink("Remove", "RemoveBookFromCollection","Member", new { id = item.GoogleVolumeId }, new { @class="btn btn-danger", style="width:100%"})
+    </td>
+</tr>
+}
+
+</table>

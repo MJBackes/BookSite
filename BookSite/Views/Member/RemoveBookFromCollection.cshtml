@@ -1,0 +1,15 @@
+﻿@model BookSite.Models.SiteModels.Book
+@{
+    ViewBag.Title = "RemoveBookFromCollection";
+}
+
+<h2>RemoveBookFromCollection</h2>
+
+@Html.Partial("BookDetails",Model)
+
+@using (Html.BeginForm())
+{
+    <h3>Remove this book from your shelf?</h3>
+    @Html.HiddenFor(model => model.GoogleVolumeId)
+    <input type="submit" class="btn btn-danger" value="Confirm" />
+}

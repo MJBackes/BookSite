@@ -270,6 +270,10 @@
     <Content Include="Views\Book\Details.cshtml" />
     <Content Include="Views\Review\Create.cshtml" />
     <Content Include="Views\Shared\BookDetails.cshtml" />
+    <Content Include="Views\Review\Edit.cshtml" />
+    <Content Include="Views\Member\AddBookToCollection.cshtml" />
+    <Content Include="Views\Member\RemoveBookFromCollection.cshtml" />
+    <Content Include="Views\Member\MyShelf.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

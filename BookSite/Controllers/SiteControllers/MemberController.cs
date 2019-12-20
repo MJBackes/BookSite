@@ -115,14 +115,16 @@ namespace BookSite.Controllers.SiteControllers
                 db.SaveChanges();
                 collection = db.Collections.FirstOrDefault(c => c.MemberId == member.Id);
             }
-            db.CollectionBooks.Add(new CollectionBooks { Id = Guid.NewGuid(), BookId = book.Id, CollectionId = collection.Id });
+            Book bookFromDb = db.Books.FirstOrDefault(b => b.GoogleVolumeId == book.GoogleVolumeId);
+            db.CollectionBooks.Add(new CollectionBooks { Id = Guid.NewGuid(), Book = bookFromDb, Collection = collection });
             db.SaveChanges();
             return RedirectToAction("Index");
         }
         [HttpGet]
-        public ActionResult RemoveBookFromCollection()
+        public ActionResult RemoveBookFromCollection(string id)
         {
-            return View();
+            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == id);
+            return View(book);
         }
         [HttpPost]
         public ActionResult RemoveBookFromCollection(Book book)
@@ -130,10 +132,29 @@ namespace BookSite.Controllers.SiteControllers
             var userId = User.Identity.GetUserId();
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
             Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == member.Id);
-            Book bookFromDB = db.Books.Find(book.Id);
+            Book bookFromDB = db.Books.FirstOrDefault(b => b.GoogleVolumeId == book.GoogleVolumeId);
             db.CollectionBooks.Remove(db.CollectionBooks.FirstOrDefault(c => c.CollectionId == collection.Id && c.BookId == bookFromDB.Id));
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public ActionResult MyShelf()
+        {
+            var userId = User.Identity.GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+            return View(GetBookCollection(userId));
+        }
+
+        private List<Book> GetBookCollection(string userId)
+        {
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == member.Id);
+            List<CollectionBooks> collectionBooks = db.CollectionBooks.Where(cb => cb.CollectionId == collection.Id).ToList();
+            List<Book> books = new List<Book>();
+            foreach (CollectionBooks cb in collectionBooks)
+                books.Add(db.Books.Find(cb.BookId));
+            return books;
         }
     }
 }

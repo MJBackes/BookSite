@@ -35,10 +35,15 @@ namespace BookSite.Controllers.SiteControllers
             var userId = User.Identity.GetUserId();
             if (userId == null)
                 return RedirectToAction("Login", "Account", null);
-            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == id);
-            book.Categories = GetCategoryString(GetCategoryArray(book));
-            book.Authors = GetAuthorString(GetAuthorArray(book));
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            Book book = GetBookFromGoogleId(id);
             ViewBag.Book = book;
+            Review previousReview = db.Reviews.FirstOrDefault(r => r.MemberId == member.Id && r.BookId == book.Id);
+            if (previousReview != null)
+            {
+                string outId = id;
+                return RedirectToAction("Edit", new { id = outId });
+            }
             return View();
         }
 
@@ -65,24 +70,41 @@ namespace BookSite.Controllers.SiteControllers
         }
 
         // GET: Review/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(string id)
         {
-            return View();
+            var userId = User.Identity.GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account", null);
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            Book book = GetBookFromGoogleId(id);
+            ViewBag.Book = book;
+            Review review = db.Reviews.FirstOrDefault(r => r.MemberId == member.Id && r.BookId == book.Id);
+            return View(review);
         }
 
         // POST: Review/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(Review review)
         {
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                var userId = User.Identity.GetUserId();
+                if (userId == null)
+                    return RedirectToAction("Login", "Account");
+                Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+                if (review.MemberId != member.Id)
+                    return RedirectToAction("Details","Book", new { id = db.Books.Find(review.BookId).GoogleVolumeId });
+                Review reviewFromDb = db.Reviews.FirstOrDefault(r => r.MemberId == member.Id && r.BookId == review.BookId);
+                reviewFromDb.Title = review.Title;
+                reviewFromDb.Rating = review.Rating;
+                reviewFromDb.Body = review.Body;
+                db.SaveChanges();
+                return RedirectToAction("Details", "Book", new { id = db.Books.Find(review.BookId).GoogleVolumeId });
             }
             catch
             {
-                return View();
+                ViewBag.Book = db.Books.Find(review.BookId);
+                return View(review);
             }
         }
 
@@ -153,6 +175,13 @@ namespace BookSite.Controllers.SiteControllers
                 tags[i] = tag;
             }
             return tags;
+        }
+        private Book GetBookFromGoogleId(string id)
+        {
+            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == id);
+            book.Categories = GetCategoryString(GetCategoryArray(book));
+            book.Authors = GetAuthorString(GetAuthorArray(book));
+            return book;
         }
     }
 }

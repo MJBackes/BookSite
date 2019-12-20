@@ -1,0 +1,15 @@
+﻿@model BookSite.Models.SiteModels.Book
+
+@{
+    ViewBag.Title = "AddBookToCollection";
+}
+
+<h2>AddBookToCollection</h2>
+
+@Html.Partial("BookDetails",Model)
+@using (Html.BeginForm())
+{
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.GoogleVolumeId)
+    <input type="submit" class="btn btn-success" value="Confirm"/>
+}
