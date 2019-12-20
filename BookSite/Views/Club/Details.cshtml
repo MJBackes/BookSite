@@ -1,0 +1,57 @@
+﻿@model BookSite.Models.SiteModels.BookClub
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>BookClub</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PrivacyLevel)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PrivacyLevel)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NextBook.Title)
+        </dt>
+
+        <dd>
+            @if (Model.NextBook == null)
+            {
+                <p>This club does not currently have a book they are reading.</p>
+            }
+            else
+            {
+            @Html.DisplayFor(model => model.NextBook.Title)
+            }
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Join","Join","Club",new { id = Model.Id},new { @class="btn btn-success"})
+    @*@Html.ActionLink("Edit", "Edit", new { id = Model.Id })*@
+</p>

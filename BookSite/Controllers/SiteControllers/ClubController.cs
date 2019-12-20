@@ -1,4 +1,5 @@
 ﻿using BookSite.Models;
+using BookSite.Models.MiscModels;
 using BookSite.Models.SiteModels;
 using Microsoft.AspNet.Identity;
 using System;
@@ -12,6 +13,7 @@ namespace BookSite.Controllers.SiteControllers
     public class ClubController : Controller
     {
         public ApplicationDbContext db;
+        private string[] COMMON_WORD_ARRAY = new string[] { "the", "a"};
         public ClubController()
         {
             db = new ApplicationDbContext();
@@ -23,9 +25,9 @@ namespace BookSite.Controllers.SiteControllers
         }
 
         // GET: Club/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(Guid? id)
         {
-            return View();
+            return View(db.BookClubs.Find(id));
         }
 
         // GET: Club/Create
@@ -65,25 +67,59 @@ namespace BookSite.Controllers.SiteControllers
                 return View();
             }
         }
-        //[HttpGet]
-        //public ActionResult Join(BookClub club)
-        //{
-
-        //}
+        [HttpGet]
+        public ActionResult Join(Guid? id)
+        {
+            return View(db.BookClubs.Find(id));
+        }
+        [HttpPost]
+        public ActionResult Join(BookClub club)
+        {
+            var userId = User.Identity.GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            club = db.BookClubs.Find(club.Id);
+            if(db.ClubMembers.FirstOrDefault(cm => cm.MemberId == member.Id && cm.ClubId == club.Id) == null)
+            {
+                db.ClubMembers.Add(new ClubMembers { Id = Guid.NewGuid(), Club = club, Member = member });
+                db.SaveChanges();
+            }
+            return RedirectToAction("Details", club);
+        }
 
         // GET: Club/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(Guid? id)
         {
-            return View();
+            return View(db.BookClubs.Find(id));
         }
 
         // POST: Club/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(BookClub club)
         {
             try
             {
-                // TODO: Add update logic here
+                club.NameIsTaken = false;
+                var userId = User.Identity.GetUserId();
+                if (userId == null)
+                    return RedirectToAction("Login", "Account");
+                BookClub bookClubWithSameName = db.BookClubs.FirstOrDefault(bc => bc.Name == club.Name);
+                if (bookClubWithSameName != null && bookClubWithSameName.Id != club.Id)
+                {
+                    club.NameIsTaken = true;
+                    return View(club);
+                }
+                Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+                ClubMembers clubMembers = db.ClubMembers.FirstOrDefault(cb => cb.MemberId == member.Id && cb.ClubId == club.Id);
+                if (clubMembers.IsManager)
+                {
+                    BookClub clubFromDb = db.BookClubs.Find(club.Id);  
+                    clubFromDb.Name = club.Name;
+                    clubFromDb.PrivacyLevel = club.PrivacyLevel;
+                    clubFromDb.Description = club.Description;
+                    db.SaveChanges();
+                }
 
                 return RedirectToAction("Index");
             }
@@ -113,6 +149,50 @@ namespace BookSite.Controllers.SiteControllers
             {
                 return View();
             }
+        }
+        [HttpGet]
+        public ActionResult Search()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Search(SimpleTextSearch search)
+        {
+            if (search.Input != null)
+            {
+                string[] inputArray = search.Input.ToLower().Split(' ');
+                List<BookClub> clubs = new List<BookClub>();
+                foreach (string s in inputArray)
+                {
+                    List<BookClub> matchingClubs = db.BookClubs.Include("NextBook").Where(c => (c.Name.Contains(s.Trim()) || c.Description.Contains(s.Trim())) && c.PrivacyLevel == "Public").ToList();
+                    clubs = clubs.Concat(matchingClubs).ToList();
+                }
+                return View("SearchResults", clubs);
+            }
+            return View(search);
+        }
+        [HttpGet]
+        public ActionResult ChooseNewBook()
+        {
+            var userId = User.Identity.GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+            return View();
+        }
+        [HttpPost]
+        public ActionResult ChooseNewBook(Guid? clubId,Book book)
+        {
+            var userId = User.Identity.GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            BookClub club = db.BookClubs.Find(clubId);
+            if(db.ClubMembers.FirstOrDefault(cm => cm.MemberId == member.Id && cm.ClubId == club.Id).IsManager)
+            {
+                club.NextBookId = book.Id;
+                db.SaveChanges();
+            }
+            return View("Index");
         }
     }
 }
