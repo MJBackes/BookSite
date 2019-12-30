@@ -9,7 +9,7 @@
 @Html.ActionLink("MyShelf", "MyShelf", "Member", null ,new { @class="btn btn-success"})
 @Html.ActionLink("Create a Book Club", "Create", "Club", null,new { @class = "btn btn-success" })
 
-@if (Model.Clubs.Count > 0)
+@if (Model != null && Model.Clubs != null)
 {
 <table class="table-striped" width="100%">
     <tr>

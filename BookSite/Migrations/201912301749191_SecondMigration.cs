@@ -78,6 +78,7 @@ namespace BookSite.Migrations
                         Id = c.Guid(nullable: false),
                         Name = c.String(),
                         ClubId = c.Guid(nullable: false),
+                        Date = c.DateTime(nullable: false),
                         StartTime = c.DateTime(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)

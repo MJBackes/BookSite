@@ -25,14 +25,18 @@ namespace BookSite.Controllers.SiteControllers
             if (userId == null)
                 return RedirectToAction("Login", "Account");
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
-            MemberIndexViewModel viewModel = new MemberIndexViewModel { MemberId = member.Id, Clubs = new List<BookClub>()};
-            List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.MemberId == member.Id).ToList();
-            foreach(ClubMembers cm in clubMembers)
+            if (member != null)
             {
-                BookClub club = db.BookClubs.Include("NextBook").FirstOrDefault(c => c.Id == cm.ClubId);
-                viewModel.Clubs.Add(club);
+                MemberIndexViewModel viewModel = new MemberIndexViewModel { MemberId = member.Id, Clubs = new List<BookClub>() };
+                List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.MemberId == member.Id).ToList();
+                foreach (ClubMembers cm in clubMembers)
+                {
+                    BookClub club = db.BookClubs.Include("NextBook").FirstOrDefault(c => c.Id == cm.ClubId);
+                    viewModel.Clubs.Add(club);
+                }
+                return View(viewModel);
             }
-            return View(viewModel);
+            return View();
         }
 
         // GET: Member/Details/5

@@ -184,16 +184,17 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\SiteControllers\BookController.cs" />
     <Compile Include="Controllers\SiteControllers\ClubController.cs" />
+    <Compile Include="Controllers\SiteControllers\DiscussionController.cs" />
     <Compile Include="Controllers\SiteControllers\MemberController.cs" />
     <Compile Include="Controllers\SiteControllers\ReviewController.cs" />
     <Compile Include="EmailInfo\EmailInfo.cs" />
-    <Compile Include="Email\EmailService.cs" />
+    <Compile Include="Email\BookSiteEmailService.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201912191855328_SecondMigration.cs" />
-    <Compile Include="Migrations\201912191855328_SecondMigration.Designer.cs">
-      <DependentUpon>201912191855328_SecondMigration.cs</DependentUpon>
+    <Compile Include="Migrations\201912301749191_SecondMigration.cs" />
+    <Compile Include="Migrations\201912301749191_SecondMigration.Designer.cs">
+      <DependentUpon>201912301749191_SecondMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -202,6 +203,7 @@
     <Compile Include="Models\EmailModels\EmailModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ViewModels\ClubIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\MemberIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\NewBookSearchViewModel.cs" />
     <Compile Include="Models\ViewModels\NewBookViewModel.cs" />
@@ -221,6 +223,8 @@
     <Compile Include="Models\SiteModels\GenreTag.cs" />
     <Compile Include="Models\SiteModels\Member.cs" />
     <Compile Include="Models\SiteModels\Review.cs" />
+    <Compile Include="Models\ViewModels\NewDiscussionInputViewModel.cs" />
+    <Compile Include="Models\ViewModels\NewDiscussionViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -299,13 +303,13 @@
     <Content Include="Views\Club\Search.cshtml" />
     <Content Include="Views\Club\Details.cshtml" />
     <Content Include="Views\Club\Join.cshtml" />
-    <Content Include="Views\Club\ChooseNewBook.cshtml" />
     <Content Include="Views\Club\_NewBookSearchPartial.cshtml" />
     <Content Include="Views\Club\_NewBookSearchResultsPartial.cshtml" />
     <Content Include="Views\Club\_NewBookDetails.cshtml" />
     <Content Include="Views\Club\NewBookSearch.cshtml" />
     <Content Include="Views\Club\NewBookSearchResults.cshtml" />
     <Content Include="Views\Club\NewBookDetails.cshtml" />
+    <Content Include="Views\Discussion\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -324,8 +328,8 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201912191855328_SecondMigration.resx">
-      <DependentUpon>201912191855328_SecondMigration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201912301749191_SecondMigration.resx">
+      <DependentUpon>201912301749191_SecondMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

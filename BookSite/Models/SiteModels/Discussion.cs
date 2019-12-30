@@ -16,6 +16,15 @@ namespace BookSite.Models.SiteModels
         [ForeignKey("BookClub")]
         public Guid ClubId { get; set; }
         public BookClub BookClub { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime Date { get; set; }
+        [Display(Name = "Start Time")]
+        [DataType(DataType.Time)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:hh:mm tt}")]
         public DateTime StartTime { get; set; }
+        public bool HasStarted { get; set; }
+        [NotMapped]
+        public Book Book { get; set; }
     }
 }

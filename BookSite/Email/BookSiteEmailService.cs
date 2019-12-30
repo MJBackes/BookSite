@@ -9,7 +9,7 @@ using MailKit.Net.Smtp;
 using MimeKit;
 namespace BookSite.Email
 {
-    public class EmailService
+    public class BookSiteEmailService
     {
 
         public static async Task SendEmail(EmailModel model)

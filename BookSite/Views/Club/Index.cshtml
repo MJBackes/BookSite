@@ -1,9 +1,103 @@
-﻿@model BookSite.Models.SiteModels.BookClub
+﻿@model BookSite.Models.ViewModels.ClubIndexViewModel
 @{
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
-
+<h2>@Model.Club.Name</h2>
+@if (Model.IsManager)
+{
 @Html.ActionLink("Edit Club", "Edit", "Club")
-@Html.ActionLink("Choose Next Book", "NewBookSearch", "Club",new { clubId = Model.Id},new { @class = "btn btn-primary"})
+}
+@Html.ActionLink("Choose Next Book", "NewBookSearch", "Club",new { clubId = Model.Club.Id},new { @class = "btn btn-primary"})
+<h3>Members</h3>
+<table class="table-striped" width="100%">
+    <tr>
+        <th class="col-md-4">
+            User Name
+        </th>
+        <th class="col-md-8">
+            User Page
+        </th>
+    </tr>
+    @foreach(BookSite.Models.SiteModels.Member member in Model.Members)
+    {
+        <tr>
+            <td>
+                @member.DisplayName
+            </td>
+        </tr>
+    }
+</table>
+<h3>Discussions</h3>
+<table class="table-striped" width="100%">
+    <tr>
+        <th class="col-md-3">
+            Name
+        </th>
+        <th class="col-md-3">
+            Book
+        </th>
+        <th class="col-md-2">
+            Date
+        </th>
+        <th class="col-md-2">
+            Time
+        </th>
+        <th class="col-md-1">
+
+        </th>
+        <th class="col-md-1">
+
+        </th>
+    </tr>
+    @if(Model.Discussions != null && Model.Discussions.Count > 0)
+    {
+        foreach(BookSite.Models.SiteModels.Discussion discussion in Model.Discussions)
+        {
+            <tr>
+                <td>
+                    @if (discussion.HasStarted)
+                    {
+                    @Html.ActionLink(discussion.Name, "View", "Discussion", new { id = discussion.Id })
+                    }
+                    else
+                    {
+                        Html.Raw(discussion.Name);
+                    }
+                </td>
+                <td>
+                    @discussion.Book.Title
+                </td>
+                <td>
+                    @discussion.StartTime.Month/@discussion.StartTime.Day/@discussion.StartTime.Year
+                </td>
+                <td>
+                    @discussion.StartTime.TimeOfDay
+                </td>
+                <td>
+                    @if(Model.IsManager && !discussion.HasStarted)
+                    {
+                        @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.Id})
+                    }
+                </td>
+                <td>
+                    @if (Model.IsManager && (discussion.StartTime - DateTime.Now).TotalMinutes < 5 && !discussion.HasStarted)
+                    {
+                        @Html.ActionLink("Start", "GoLive", "Discussion", new { id = discussion.Id}, new { @class = "btn btn-success" })
+                    }
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td>
+                This Club has not had any Discussions yet.
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    }
+</table>

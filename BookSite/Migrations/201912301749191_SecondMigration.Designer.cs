@@ -13,7 +13,7 @@ namespace BookSite.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201912191855328_SecondMigration"; }
+            get { return "201912301749191_SecondMigration"; }
         }
         
         string IMigrationMetadata.Source

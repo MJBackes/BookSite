@@ -26,8 +26,9 @@ namespace BookSite.Controllers.SiteControllers
         [HttpGet]
         public ActionResult Index(Guid id)
         {
-            BookClub club = db.BookClubs.FirstOrDefault(c => c.Id == id);
-            return View(club);
+            BookClub club = db.BookClubs.Find(id);
+            ClubIndexViewModel viewModel = GetClubIndexViewModel(club);
+            return View(viewModel);
         }
 
         // GET: Club/Details/5
@@ -183,15 +184,7 @@ namespace BookSite.Controllers.SiteControllers
             var userId = User.Identity.GetUserId();
             if (userId == null)
                 return RedirectToAction("Login", "Account");
-            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
-            BookClub club = db.BookClubs.Find(viewModel.ClubId);
-            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == viewModel.GoogleVolumeId);
-            if (db.ClubMembers.FirstOrDefault(cm => cm.MemberId == member.Id && cm.ClubId == club.Id).IsManager)
-            {
-                club.NextBookId = book.Id;
-                db.SaveChanges();
-            }
-            return View("Index",club);
+            return RedirectToAction("Create","Discussion",new NewDiscussionInputViewModel { ClubId = viewModel.ClubId, GoogleVolumeId = viewModel.GoogleVolumeId});
         }
         [HttpGet]
         public ActionResult NewBookSearch(Guid clubId)
@@ -355,6 +348,26 @@ namespace BookSite.Controllers.SiteControllers
                         output.Append(" , ");
                 }
             return output.ToString();
+        }
+        private ClubIndexViewModel GetClubIndexViewModel(BookClub club)
+        {
+            var userId = User.Identity.GetUserId();
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            ClubIndexViewModel viewModel = new ClubIndexViewModel { Club = club, Discussions = new List<Discussion>(), Members = new List<Member>() };
+            List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.ClubId == club.Id).ToList();
+            foreach (ClubMembers cm in clubMembers)
+            {
+                viewModel.Members.Add(db.Members.Find(cm.MemberId));
+                if (cm.MemberId == member.Id && cm.IsManager)
+                    viewModel.IsManager = true;
+            }
+            viewModel.Discussions = db.Discussions.Where(d => d.ClubId == club.Id).ToList();
+            foreach (Discussion discussion in viewModel.Discussions)
+            {
+                BookDiscussions bookDiscussions = db.BookDiscussions.Include("Book").FirstOrDefault(bd => bd.DiscussionId == discussion.Id);
+                discussion.Book = bookDiscussions.Book;
+            }
+            return viewModel;
         }
     }
 }
