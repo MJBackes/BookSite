@@ -21,6 +21,8 @@ namespace BookSite.APIHandlers
         }
         public static GoogleBooksSearchResponse FullSearch(Search input)
         {
+            if (input == null)
+                return default;
             StringBuilder URI = new StringBuilder($"https://www.googleapis.com/books/v1/volumes?q=");
             if (input.other != null)
                 URI.Append(input.other);

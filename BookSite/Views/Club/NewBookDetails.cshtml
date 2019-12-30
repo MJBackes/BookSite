@@ -8,7 +8,7 @@
 
 <div>
     @Html.Partial("BookDetails", Model.Book)
-    @Html.ActionLink("Select", "ChooseNewBook", "Club", new { viewModel = new BookSite.Models.ViewModels.NewBookViewModel { ClubId = Model.ClubId, Book = Model.Book, GoogleVolumeId = Model.GoogleVolumeId } }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Select", "ChooseNewBook", "Club", new {  ClubId = Model.ClubId, GoogleVolumeId = Model.GoogleVolumeId }, new { @class = "btn btn-primary" })
     <h3>Reviews</h3>
     <table class="table-striped">
         <tbody>
@@ -23,7 +23,7 @@
                     Review
                 </th>
             </tr>
-            @if (ViewBag.Reviews.Count > 0)
+            @if (Model.Reviews.Count > 0)
             {
                 foreach (BookSite.Models.SiteModels.Review review in Model.Reviews)
                 {

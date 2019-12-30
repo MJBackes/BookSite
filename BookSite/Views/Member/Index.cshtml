@@ -11,7 +11,7 @@
 
 @if (Model.Clubs.Count > 0)
 {
-<table class="table-striped">
+<table class="table-striped" width="100%">
     <tr>
         <th class="col-md-3">
             Club Name
@@ -34,8 +34,12 @@
                {
                @club.NextBook.Title
                }
+               else
+               {
+                   @Html.Raw("None");
+               }
            </td>
-           <td>
+           <td style="text-align:center">
                @Html.ActionLink("Home Page", "Index", "Club",new { id = club.Id}, new { @class = "btn btn-primary" })
            </td>
        </tr>

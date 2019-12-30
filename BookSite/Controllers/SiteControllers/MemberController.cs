@@ -29,7 +29,7 @@ namespace BookSite.Controllers.SiteControllers
             List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.MemberId == member.Id).ToList();
             foreach(ClubMembers cm in clubMembers)
             {
-                BookClub club = db.BookClubs.FirstOrDefault(c => c.Id == cm.ClubId);
+                BookClub club = db.BookClubs.Include("NextBook").FirstOrDefault(c => c.Id == cm.ClubId);
                 viewModel.Clubs.Add(club);
             }
             return View(viewModel);

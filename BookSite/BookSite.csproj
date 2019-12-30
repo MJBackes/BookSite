@@ -190,6 +190,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\MemberIndexViewModel.cs" />
+    <Compile Include="Models\ViewModels\NewBookSearchViewModel.cs" />
     <Compile Include="Models\ViewModels\NewBookViewModel.cs" />
     <Compile Include="Models\MiscModels\Search.cs" />
     <Compile Include="Models\MiscModels\SimpleTextSearch.cs" />
@@ -290,7 +291,7 @@
     <Content Include="Views\Club\_NewBookSearchResultsPartial.cshtml" />
     <Content Include="Views\Club\_NewBookDetails.cshtml" />
     <Content Include="Views\Club\NewBookSearch.cshtml" />
-    <Content Include="Views\Club\NewBookSearchRresults.cshtml" />
+    <Content Include="Views\Club\NewBookSearchResults.cshtml" />
     <Content Include="Views\Club\NewBookDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>

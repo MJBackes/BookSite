@@ -66,7 +66,7 @@ namespace BookSite.Controllers.SiteControllers
                 db.BookClubs.Add(club);
                 db.ClubMembers.Add(new ClubMembers { Id = Guid.NewGuid(), Club = club, Member = member, IsManager = true });
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index",club);
             }
             catch
             {
@@ -178,14 +178,6 @@ namespace BookSite.Controllers.SiteControllers
             return View(search);
         }
         [HttpGet]
-        public ActionResult ChooseNewBook()
-        {
-            var userId = User.Identity.GetUserId();
-            if (userId == null)
-                return RedirectToAction("Login", "Account");
-            return View();
-        }
-        [HttpPost]
         public ActionResult ChooseNewBook(NewBookViewModel viewModel)
         {
             var userId = User.Identity.GetUserId();
@@ -194,12 +186,12 @@ namespace BookSite.Controllers.SiteControllers
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
             BookClub club = db.BookClubs.Find(viewModel.ClubId);
             Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == viewModel.GoogleVolumeId);
-            if(db.ClubMembers.FirstOrDefault(cm => cm.MemberId == member.Id && cm.ClubId == club.Id).IsManager)
+            if (db.ClubMembers.FirstOrDefault(cm => cm.MemberId == member.Id && cm.ClubId == club.Id).IsManager)
             {
                 club.NextBookId = book.Id;
                 db.SaveChanges();
             }
-            return View("Index");
+            return View("Index",club);
         }
         [HttpGet]
         public ActionResult NewBookSearch(Guid clubId)
@@ -210,13 +202,13 @@ namespace BookSite.Controllers.SiteControllers
         [HttpPost]
         public ActionResult NewBookSearch(NewBookViewModel viewModel)
         {
-            GoogleBooksSearchResponse response = GoogleBooksAPIHandler.FullSearch(viewModel.Search);
-            viewModel.Books = ParseSearchResponse(response);
-            return RedirectToAction("NewBookSearchResults", viewModel);
+            return RedirectToAction("NewBookSearchResults", new NewBookSearchViewModel { ClubId = viewModel.ClubId, InAuthor = viewModel.Search.inauthor, InTitle = viewModel.Search.intitle, ISBN = viewModel.Search.isbn, Other = viewModel.Search.other, Subject = viewModel.Search.subject});
         }
         [HttpGet]
-        public ActionResult NewBookSearchResults(NewBookViewModel viewModel)
+        public ActionResult NewBookSearchResults(NewBookSearchViewModel input)
         {
+            GoogleBooksSearchResponse response = GoogleBooksAPIHandler.FullSearch(new Models.MiscModels.Search { inauthor = input.InAuthor, intitle = input.InTitle, isbn = input.ISBN, other = input.Other, subject = input.Subject});
+            NewBookViewModel viewModel = new NewBookViewModel { Books = ParseSearchResponse(response), ClubId = input.ClubId};
             return View(viewModel);
         }
         [HttpGet]
@@ -267,6 +259,8 @@ namespace BookSite.Controllers.SiteControllers
         }
         private List<Book> ParseSearchResponse(GoogleBooksSearchResponse response)
         {
+            if (response == null)
+                return default;
             List<Book> output = new List<Book>();
             foreach (Item item in response.items)
             {
