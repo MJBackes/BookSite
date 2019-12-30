@@ -1,10 +1,14 @@
-﻿using BookSite.Models;
+﻿using BookSite.APIHandlers;
+using BookSite.Models;
+using BookSite.Models.APIResponseModels;
 using BookSite.Models.MiscModels;
 using BookSite.Models.SiteModels;
+using BookSite.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -19,9 +23,11 @@ namespace BookSite.Controllers.SiteControllers
             db = new ApplicationDbContext();
         }
         // GET: Club
-        public ActionResult Index()
+        [HttpGet]
+        public ActionResult Index(Guid id)
         {
-            return View();
+            BookClub club = db.BookClubs.FirstOrDefault(c => c.Id == id);
+            return View(club);
         }
 
         // GET: Club/Details/5
@@ -180,19 +186,181 @@ namespace BookSite.Controllers.SiteControllers
             return View();
         }
         [HttpPost]
-        public ActionResult ChooseNewBook(Guid? clubId,Book book)
+        public ActionResult ChooseNewBook(NewBookViewModel viewModel)
         {
             var userId = User.Identity.GetUserId();
             if (userId == null)
                 return RedirectToAction("Login", "Account");
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
-            BookClub club = db.BookClubs.Find(clubId);
+            BookClub club = db.BookClubs.Find(viewModel.ClubId);
+            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == viewModel.GoogleVolumeId);
             if(db.ClubMembers.FirstOrDefault(cm => cm.MemberId == member.Id && cm.ClubId == club.Id).IsManager)
             {
                 club.NextBookId = book.Id;
                 db.SaveChanges();
             }
             return View("Index");
+        }
+        [HttpGet]
+        public ActionResult NewBookSearch(Guid clubId)
+        {
+            NewBookViewModel viewModel = new NewBookViewModel { ClubId = clubId };
+            return View(viewModel);
+        }
+        [HttpPost]
+        public ActionResult NewBookSearch(NewBookViewModel viewModel)
+        {
+            GoogleBooksSearchResponse response = GoogleBooksAPIHandler.FullSearch(viewModel.Search);
+            viewModel.Books = ParseSearchResponse(response);
+            return RedirectToAction("NewBookSearchResults", viewModel);
+        }
+        [HttpGet]
+        public ActionResult NewBookSearchResults(NewBookViewModel viewModel)
+        {
+            return View(viewModel);
+        }
+        [HttpGet]
+        public ActionResult NewBookDetails(string id, Guid clubId)
+        {
+            NewBookViewModel viewModel = new NewBookViewModel();
+            viewModel.GoogleVolumeId = id;
+            viewModel.ClubId = clubId;
+            viewModel.Book = ParseSingleSearchResponse(GoogleBooksAPIHandler.SingleSearch(viewModel.GoogleVolumeId).Result);
+            viewModel.Reviews = db.Reviews.Include("Member").Where(r => r.BookId == viewModel.Book.Id).ToList();
+            return View(viewModel);
+        }
+
+        //Private Methods
+
+        private Book ParseSingleSearchResponse(GoogleBookSingleResponse response)
+        {
+            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == response.id);
+            if (book != null)
+            {
+                book.Authors = GetAuthorString(response.volumeInfo.authors);
+                book.Categories = GetCategoryString(response.volumeInfo.categories);
+                return book;
+            }
+            else
+            {
+                return AddNewSingleBook(response);
+            }
+        }
+        private Book AddNewSingleBook(GoogleBookSingleResponse response)
+        {
+            Book book = new Book()
+            {
+                Id = Guid.NewGuid(),
+                GoogleVolumeId = response.id,
+                Description = response.volumeInfo.description,
+                Title = response.volumeInfo.title,
+                PageCount = response.volumeInfo.pageCount,
+                Thumbnail = response.volumeInfo.imageLinks == null ? null : response.volumeInfo.imageLinks.thumbnail
+            };
+            book.Authors = GetAuthorString(response.volumeInfo.authors);
+            AddBookAuthorJunctionEntries(book, response.volumeInfo.authors);
+            book.Categories = GetCategoryString(response.volumeInfo.categories);
+            AddBookTagJunctionEntries(book, response.volumeInfo.categories);
+            db.Books.Add(book);
+            db.SaveChanges();
+            return book;
+        }
+        private List<Book> ParseSearchResponse(GoogleBooksSearchResponse response)
+        {
+            List<Book> output = new List<Book>();
+            foreach (Item item in response.items)
+            {
+                output.Add(ParseSearchItem(item));
+            }
+            return output;
+        }
+        private Book ParseSearchItem(Item item)
+        {
+            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == item.id);
+            if (book != null)
+            {
+                book.Authors = GetAuthorString(item.volumeInfo.authors);
+                book.Categories = GetCategoryString(item.volumeInfo.categories);
+                return book;
+            }
+            else
+            {
+                return AddNewVolumeBook(item);
+            }
+        }
+        private Book AddNewVolumeBook(Item item)
+        {
+            Book book = new Book()
+            {
+                Id = Guid.NewGuid(),
+                GoogleVolumeId = item.id,
+                Description = item.volumeInfo.description,
+                Title = item.volumeInfo.title,
+                PageCount = item.volumeInfo.pageCount,
+                Thumbnail = item.volumeInfo.imageLinks == null ? null : item.volumeInfo.imageLinks.thumbnail
+            };
+            book.Authors = GetAuthorString(item.volumeInfo.authors);
+            AddBookAuthorJunctionEntries(book, item.volumeInfo.authors);
+            book.Categories = GetCategoryString(item.volumeInfo.categories);
+            AddBookTagJunctionEntries(book, item.volumeInfo.categories);
+            return book;
+        }
+        private void AddBookAuthorJunctionEntries(Book book, string[] authors)
+        {
+            foreach (string s in authors)
+            {
+                Author author = db.Authors.FirstOrDefault(a => a.Name == s);
+                db.BookAuthors.Add(new BookAuthors { Id = Guid.NewGuid(), Author = author, Book = book });
+            }
+            db.SaveChanges();
+        }
+        private void AddBookTagJunctionEntries(Book book, string[] categories)
+        {
+            if (categories != null)
+            {
+                foreach (string s in categories)
+                {
+                    GenreTag tag = db.GenreTags.FirstOrDefault(t => t.Name == s);
+                    db.BookTags.Add(new BookTags { Id = Guid.NewGuid(), BookId = book.Id, TagId = tag.Id });
+                }
+            }
+            db.SaveChanges();
+        }
+        private string GetCategoryString(string[] categories)
+        {
+            StringBuilder output = new StringBuilder("");
+            if (categories != null)
+                for (int i = 0; i < categories.Length; i++)
+                {
+                    string categoryName = categories[i];
+                    if (db.GenreTags.FirstOrDefault(g => g.Name == categoryName) == null)
+                    {
+                        db.GenreTags.Add(new GenreTag { Id = Guid.NewGuid(), Name = categoryName });
+                        db.SaveChanges();
+                    }
+                    output.Append(categories[i]);
+                    if (i != categories.Length - 1)
+                        output.Append(" , ");
+                }
+            return output.ToString();
+        }
+        private string GetAuthorString(string[] authors)
+        {
+            StringBuilder output = new StringBuilder("");
+            if (authors != null)
+                for (int i = 0; i < authors.Length; i++)
+                {
+                    string authorName = authors[i];
+                    if (db.Authors.FirstOrDefault(a => a.Name == authorName) == null)
+                    {
+                        db.Authors.Add(new Author { Name = authorName, Id = Guid.NewGuid() });
+                        db.SaveChanges();
+                    }
+                    output.Append(authors[i]);
+                    if (i != authors.Length - 1)
+                        output.Append(" , ");
+                }
+            return output.ToString();
         }
     }
 }

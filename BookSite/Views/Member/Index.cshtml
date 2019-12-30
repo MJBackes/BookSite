@@ -1,4 +1,4 @@
-﻿
+﻿@model BookSite.Models.ViewModels.MemberIndexViewModel
 @{
     ViewBag.Title = "Index";
 }
@@ -8,3 +8,37 @@
 @Html.ActionLink("Search For A Book Club", "Search", "Club", null, new { @class="btn btn-primary"})
 @Html.ActionLink("MyShelf", "MyShelf", "Member", null ,new { @class="btn btn-success"})
 @Html.ActionLink("Create a Book Club", "Create", "Club", null,new { @class = "btn btn-success" })
+
+@if (Model.Clubs.Count > 0)
+{
+<table class="table-striped">
+    <tr>
+        <th class="col-md-3">
+            Club Name
+        </th>
+        <th class="col-md-3">
+            Current Book
+        </th>
+        <th class="col-md-6">
+
+        </th>
+    </tr>
+    @foreach (BookSite.Models.SiteModels.BookClub club in Model.Clubs)
+    {
+       <tr>
+            <td>
+               @club.Name
+            </td>
+           <td>
+               @if (club.NextBook != null)
+               {
+               @club.NextBook.Title
+               }
+           </td>
+           <td>
+               @Html.ActionLink("Home Page", "Index", "Club",new { id = club.Id}, new { @class = "btn btn-primary" })
+           </td>
+       </tr>
+    }
+</table>
+}

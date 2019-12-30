@@ -1,9 +1,9 @@
-﻿@model BookSite.Models.SiteModels.Book
+﻿@model BookSite.Models.ViewModels.NewBookViewModel
 @{
     ViewBag.Title = "ChooseNewBook";
 }
 
-<h2>ChooseNewBook</h2>
+<h2>Select A New Book</h2>
 @*User RenderAction on a search partial view to find a list of books with a button to select it.*@
 
-
+@Html.Partial("_NewBookSearchPartial")

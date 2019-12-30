@@ -1,5 +1,6 @@
 ﻿using BookSite.Models;
 using BookSite.Models.SiteModels;
+using BookSite.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,18 @@ namespace BookSite.Controllers.SiteControllers
         // GET: Member
         public ActionResult Index()
         {
-            return View();
+            var userId = User.Identity.GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            MemberIndexViewModel viewModel = new MemberIndexViewModel { MemberId = member.Id, Clubs = new List<BookClub>()};
+            List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.MemberId == member.Id).ToList();
+            foreach(ClubMembers cm in clubMembers)
+            {
+                BookClub club = db.BookClubs.FirstOrDefault(c => c.Id == cm.ClubId);
+                viewModel.Clubs.Add(club);
+            }
+            return View(viewModel);
         }
 
         // GET: Member/Details/5

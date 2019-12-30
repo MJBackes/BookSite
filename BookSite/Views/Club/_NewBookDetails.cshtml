@@ -1,0 +1,65 @@
+﻿@model BookSite.Models.SiteModels.Book
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    @Html.Partial("BookDetails", Model)
+    @Html.ActionLink("Select", "ChooseNewBook", "Club", new { id = Model.GoogleVolumeId }, new { @class = "btn btn-primary" })
+    <h3>Reviews</h3>
+    <table class="table-striped">
+        <tbody>
+            <tr>
+                <th class="col-md-2">
+                    User Name
+                </th>
+                <th class="col-md-2">
+                    Rating
+                </th>
+                <th class="col-md-6">
+                    Review
+                </th>
+            </tr>
+            @if (ViewBag.Reviews.Count > 0)
+            {
+                foreach (BookSite.Models.SiteModels.Review review in ViewBag.Reviews)
+                {
+                    <tr>
+                        <td>
+                            @review.Member.DisplayName
+                        </td>
+                        <td>
+                            @review.Rating
+                        </td>
+                        <td>
+                            @review.Body
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        No reviews have been left for this book yet. Be the first to write one!
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td></td>
+                <td></td>
+                <td>
+                    @Html.ActionLink("Leave a Review", "Create", "Review", new { id = Model.GoogleVolumeId }, new { @class = "btn btn-primary" })
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<p>
+    |@Html.ActionLink("Home", "Index")
+</p>

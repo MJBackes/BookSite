@@ -1,5 +1,4 @@
-﻿@model List<BookSite.Models.SiteModels.Book>
-
+﻿@model BookSite.Models.ViewModels.NewBookViewModel
 @{
     ViewBag.Title = "Search Results";
 }
@@ -27,7 +26,7 @@
         <th></th>
     </tr>
 
-    @foreach (var item in Model)
+    @foreach (var item in Model.Books)
     {
         <tr>
             <td>
@@ -49,7 +48,7 @@
                 @Html.DisplayFor(modelItem => item.PageCount)
             </td>
             <td>
-                @Html.ActionLink("Details", "Details", new { id = item.GoogleVolumeId })
+                @Html.ActionLink("Details", "NewBookDetails", new { id = item.GoogleVolumeId , clubId = (Model).ClubId})
             </td>
         </tr>
     }
