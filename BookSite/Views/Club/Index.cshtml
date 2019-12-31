@@ -6,7 +6,7 @@
 <h2>@Model.Club.Name</h2>
 @if (Model.IsManager)
 {
-@Html.ActionLink("Edit Club", "Edit", "Club")
+@Html.ActionLink("Edit Club", "Edit", "Club", new { id = Model.Club.Id }, null)
 }
 @Html.ActionLink("Choose Next Book", "NewBookSearch", "Club",new { clubId = Model.Club.Id},new { @class = "btn btn-primary"})
 <h3>Members</h3>
@@ -16,14 +16,13 @@
             User Name
         </th>
         <th class="col-md-8">
-            User Page
         </th>
     </tr>
     @foreach(BookSite.Models.SiteModels.Member member in Model.Members)
     {
         <tr>
             <td>
-                @member.DisplayName
+                @Html.ActionLink(member.DisplayName, "Details", "Member", new { id = member.Id }, null)
             </td>
         </tr>
     }
@@ -58,7 +57,7 @@
                 <td>
                     @if (discussion.HasStarted)
                     {
-                    @Html.ActionLink(discussion.Name, "View", "Discussion", new { id = discussion.Id })
+                        @Html.ActionLink(discussion.Name, "View", "Discussion", new { id = discussion.Id })
                     }
                     else
                     {
@@ -72,7 +71,7 @@
                     @discussion.StartTime.Month/@discussion.StartTime.Day/@discussion.StartTime.Year
                 </td>
                 <td>
-                    @discussion.StartTime.TimeOfDay
+                    @discussion.StartTime.ToShortTimeString()
                 </td>
                 <td>
                     @if(Model.IsManager && !discussion.HasStarted)
@@ -81,7 +80,7 @@
                     }
                 </td>
                 <td>
-                    @if (Model.IsManager && (discussion.StartTime - DateTime.Now).TotalMinutes < 5 && !discussion.HasStarted)
+                    @if ((discussion.StartTime - DateTime.Now).TotalMinutes < 5 && !discussion.HasStarted)
                     {
                         @Html.ActionLink("Start", "GoLive", "Discussion", new { id = discussion.Id}, new { @class = "btn btn-success" })
                     }

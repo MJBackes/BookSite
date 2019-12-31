@@ -96,7 +96,7 @@ namespace BookSite.Controllers.SiteControllers
         }
 
         // GET: Club/Edit/5
-        public ActionResult Edit(Guid? id)
+        public ActionResult Edit(Guid id)
         {
             return View(db.BookClubs.Find(id));
         }
@@ -128,7 +128,7 @@ namespace BookSite.Controllers.SiteControllers
                     db.SaveChanges();
                 }
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { id = club.Id});
             }
             catch
             {

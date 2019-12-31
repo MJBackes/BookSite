@@ -45,4 +45,33 @@
        </tr>
     }
 </table>
+
+<h3>Friends</h3>
+<table class="table-striped" width="100%">
+    <tr>
+        <th class="col-md-3">
+            User Name
+        </th>
+        <th class="col-md-3">
+
+        </th>
+        <th class="col-md-6">
+
+        </th>
+    </tr>
+    @foreach (BookSite.Models.SiteModels.Member friend in Model.Friends)
+    {
+        <tr>
+            <td>
+                @Html.ActionLink(friend.DisplayName, "Details", "Member", new { id = friend.Id }, null)
+            </td>
+            <td>
+
+            </td>
+            <td style="text-align:center">
+                @Html.ActionLink("Remove Friend", "RemoveFriend", "Member", new { id = friend.Id}, new { @class = "btn btn-danger"})
+            </td>
+        </tr>
+    }
+</table>
 }

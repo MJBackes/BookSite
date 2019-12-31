@@ -1,0 +1,15 @@
+﻿@model BookSite.Models.ViewModels.RemoveFriendViewModel
+@{
+    ViewBag.Title = "RemoveFriend";
+}
+
+<h2>Remove Friend</h2>
+
+<h3>Are you sure you want to remove @Model.Friend.DisplayName as your friend?</h3>
+
+@using (Html.BeginForm())
+{
+    <input type="submit" class="btn btn-success" value="Yes" />
+    @Html.ActionLink("No", "Index", "Member", null, new { @class = "btn btn-danger" })
+    @Html.HiddenFor(model => model.Friend.Id)
+}

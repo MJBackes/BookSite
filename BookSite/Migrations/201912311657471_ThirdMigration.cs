@@ -3,7 +3,7 @@ namespace BookSite.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class SecondMigration : DbMigration
+    public partial class ThirdMigration : DbMigration
     {
         public override void Up()
         {
@@ -80,6 +80,7 @@ namespace BookSite.Migrations
                         ClubId = c.Guid(nullable: false),
                         Date = c.DateTime(nullable: false),
                         StartTime = c.DateTime(nullable: false),
+                        HasStarted = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.BookClubs", t => t.ClubId, cascadeDelete: true)
@@ -242,6 +243,29 @@ namespace BookSite.Migrations
                 .Index(t => t.MemberId);
             
             CreateTable(
+                "dbo.FriendLists",
+                c => new
+                    {
+                        Id = c.Guid(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Members", t => t.Id)
+                .Index(t => t.Id);
+            
+            CreateTable(
+                "dbo.FriendPairs",
+                c => new
+                    {
+                        ListId = c.Guid(nullable: false),
+                        FriendId = c.Guid(nullable: false),
+                    })
+                .PrimaryKey(t => new { t.ListId, t.FriendId })
+                .ForeignKey("dbo.Members", t => t.FriendId, cascadeDelete: true)
+                .ForeignKey("dbo.FriendLists", t => t.ListId, cascadeDelete: true)
+                .Index(t => t.ListId)
+                .Index(t => t.FriendId);
+            
+            CreateTable(
                 "dbo.Reviews",
                 c => new
                     {
@@ -275,6 +299,9 @@ namespace BookSite.Migrations
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
             DropForeignKey("dbo.Reviews", "MemberId", "dbo.Members");
             DropForeignKey("dbo.Reviews", "BookId", "dbo.Books");
+            DropForeignKey("dbo.FriendPairs", "ListId", "dbo.FriendLists");
+            DropForeignKey("dbo.FriendPairs", "FriendId", "dbo.Members");
+            DropForeignKey("dbo.FriendLists", "Id", "dbo.Members");
             DropForeignKey("dbo.Comments", "MemberId", "dbo.Members");
             DropForeignKey("dbo.Comments", "DiscussionId", "dbo.Discussions");
             DropForeignKey("dbo.Comments", "BookId", "dbo.Books");
@@ -298,6 +325,9 @@ namespace BookSite.Migrations
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
             DropIndex("dbo.Reviews", new[] { "MemberId" });
             DropIndex("dbo.Reviews", new[] { "BookId" });
+            DropIndex("dbo.FriendPairs", new[] { "FriendId" });
+            DropIndex("dbo.FriendPairs", new[] { "ListId" });
+            DropIndex("dbo.FriendLists", new[] { "Id" });
             DropIndex("dbo.Comments", new[] { "MemberId" });
             DropIndex("dbo.Comments", new[] { "BookId" });
             DropIndex("dbo.Comments", new[] { "DiscussionId" });
@@ -322,6 +352,8 @@ namespace BookSite.Migrations
             DropIndex("dbo.BookAuthors", new[] { "BookId" });
             DropTable("dbo.AspNetRoles");
             DropTable("dbo.Reviews");
+            DropTable("dbo.FriendPairs");
+            DropTable("dbo.FriendLists");
             DropTable("dbo.Comments");
             DropTable("dbo.Collections");
             DropTable("dbo.CollectionBooks");

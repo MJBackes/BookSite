@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Threading.Tasks;
 
 namespace BookSite.Controllers.SiteControllers
 {
@@ -47,11 +48,11 @@ namespace BookSite.Controllers.SiteControllers
                     return View(viewModel);
                 DateTime Start = new DateTime
                     (
-                    viewModel.Date.Year, 
-                    viewModel.Date.Month, 
-                    viewModel.Date.Day, 
-                    viewModel.StartTime.Hour, 
-                    viewModel.StartTime.Minute, 
+                    viewModel.Date.Year,
+                    viewModel.Date.Month,
+                    viewModel.Date.Day,
+                    viewModel.StartTime.Hour,
+                    viewModel.StartTime.Minute,
                     0
                     );
                 Discussion discussion = new Discussion
@@ -59,7 +60,8 @@ namespace BookSite.Controllers.SiteControllers
                     Id = Guid.NewGuid(),
                     ClubId = viewModel.ClubId,
                     Name = viewModel.Name,
-                    StartTime = Start
+                    StartTime = Start,
+                    Date = Start.Date
                 };
                 BookDiscussions bookDiscussions = new BookDiscussions
                 {
@@ -74,7 +76,7 @@ namespace BookSite.Controllers.SiteControllers
             }
             catch
             {
-                return View();
+                return View(viewModel);
             }
         }
 
@@ -125,7 +127,7 @@ namespace BookSite.Controllers.SiteControllers
         public ActionResult GoLive(Guid id)
         {
             Discussion discussion = db.Discussions.Find(id);
-            NotifyMembers(discussion);
+            //NotifyMembers(discussion);
             discussion.HasStarted = true;
             return RedirectToAction("View", id);
         }
@@ -136,7 +138,7 @@ namespace BookSite.Controllers.SiteControllers
         }
 
         //private methods
-        private async void NotifyMembers(Discussion discussion)
+        private async Task NotifyMembers(Discussion discussion)
         {
             BookClub club = db.BookClubs.Find(discussion.ClubId);
             List<ClubMembers> clubMembers = db.ClubMembers.Include("Member").Where(cm => cm.ClubId == club.Id).ToList();
@@ -146,8 +148,9 @@ namespace BookSite.Controllers.SiteControllers
         }
         private EmailModel BuildEmailModel(Member member, Discussion discussion)
         {
+            string BaseURL = "";
             string MemberEmail = db.Users.Find(member.ApplicationUserId).Email;
-            string URL = $"Site/Discussion/View/{discussion.Id}";
+            string URL = $"{BaseURL}/Discussion/View/{discussion.Id}";
             return new EmailModel
             {
                 FromDisplayName = "BookSite",

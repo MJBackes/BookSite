@@ -192,9 +192,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201912301749191_SecondMigration.cs" />
-    <Compile Include="Migrations\201912301749191_SecondMigration.Designer.cs">
-      <DependentUpon>201912301749191_SecondMigration.cs</DependentUpon>
+    <Compile Include="Migrations\201912311657471_ThirdMigration.cs" />
+    <Compile Include="Migrations\201912311657471_ThirdMigration.Designer.cs">
+      <DependentUpon>201912311657471_ThirdMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -203,7 +203,10 @@
     <Compile Include="Models\EmailModels\EmailModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\SiteModels\FriendList.cs" />
+    <Compile Include="Models\SiteModels\FriendPair.cs" />
     <Compile Include="Models\ViewModels\ClubIndexViewModel.cs" />
+    <Compile Include="Models\ViewModels\MemberDetailsViewModel.cs" />
     <Compile Include="Models\ViewModels\MemberIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\NewBookSearchViewModel.cs" />
     <Compile Include="Models\ViewModels\NewBookViewModel.cs" />
@@ -225,6 +228,7 @@
     <Compile Include="Models\SiteModels\Review.cs" />
     <Compile Include="Models\ViewModels\NewDiscussionInputViewModel.cs" />
     <Compile Include="Models\ViewModels\NewDiscussionViewModel.cs" />
+    <Compile Include="Models\ViewModels\RemoveFriendViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -310,6 +314,8 @@
     <Content Include="Views\Club\NewBookSearchResults.cshtml" />
     <Content Include="Views\Club\NewBookDetails.cshtml" />
     <Content Include="Views\Discussion\Create.cshtml" />
+    <Content Include="Views\Member\Details.cshtml" />
+    <Content Include="Views\Member\RemoveFriend.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -328,8 +334,8 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201912301749191_SecondMigration.resx">
-      <DependentUpon>201912301749191_SecondMigration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201912311657471_ThirdMigration.resx">
+      <DependentUpon>201912311657471_ThirdMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

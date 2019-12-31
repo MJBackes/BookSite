@@ -28,21 +28,22 @@ namespace BookSite.Controllers.SiteControllers
             if (member != null)
             {
                 MemberIndexViewModel viewModel = new MemberIndexViewModel { MemberId = member.Id, Clubs = new List<BookClub>() };
-                List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.MemberId == member.Id).ToList();
-                foreach (ClubMembers cm in clubMembers)
-                {
-                    BookClub club = db.BookClubs.Include("NextBook").FirstOrDefault(c => c.Id == cm.ClubId);
-                    viewModel.Clubs.Add(club);
-                }
+                viewModel.Clubs = GetBookClubs(member);
+                viewModel.Friends = GetFriendsList(member);
                 return View(viewModel);
             }
             return View();
         }
 
         // GET: Member/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(Guid id)
         {
-            return View();
+            var userId = User.Identity.GetUserId();
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            if (id == member.Id)
+                return RedirectToAction("Index");
+            MemberDetailsViewModel viewModel = BuildMemberDetailsViewModel(id);
+            return View(viewModel);
         }
 
         // GET: Member/Create
@@ -126,7 +127,7 @@ namespace BookSite.Controllers.SiteControllers
                 return RedirectToAction("Login", "Account");
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
             Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == member.Id);
-            if(collection == null)
+            if (collection == null)
             {
                 db.Collections.Add(new Collection { Id = Guid.NewGuid(), MemberId = member.Id });
                 db.SaveChanges();
@@ -162,6 +163,50 @@ namespace BookSite.Controllers.SiteControllers
                 return RedirectToAction("Login", "Account");
             return View(GetBookCollection(userId));
         }
+        [HttpGet]
+        public ActionResult AddFriend(Guid id)
+        {
+            var userId = User.Identity.GetUserId();
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            FriendList friendList = db.FriendLists.FirstOrDefault(l => l.Id == member.Id);
+            if (friendList == null)
+            {
+                friendList = new FriendList { Member = member };
+                db.FriendLists.Add(friendList);
+                db.SaveChanges();
+            }
+            FriendPair pair = new FriendPair
+            {
+                Friend = db.Members.Find(id),
+                List = friendList
+            };
+            db.FriendPairs.Add(pair);
+            db.SaveChanges();
+            return RedirectToAction("Details", new { id = id });
+        }
+        [HttpGet]
+        public ActionResult RemoveFriend(Guid id)
+        {
+            RemoveFriendViewModel viewModel = new RemoveFriendViewModel
+            {
+                Friend = db.Members.Find(id)
+            };
+            return View(viewModel);
+        }
+        [HttpPost]
+        public ActionResult RemoveFriend(RemoveFriendViewModel viewModel)
+        {
+            var userId = User.Identity.GetUserId();
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            db.FriendPairs.Remove(db.FriendPairs.FirstOrDefault(p => p.FriendId == viewModel.Friend.Id && p.ListId == member.Id));
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+
+
+
+        //private methods
 
         private List<Book> GetBookCollection(string userId)
         {
@@ -228,6 +273,47 @@ namespace BookSite.Controllers.SiteControllers
             book.Categories = GetCategoryString(GetCategoryArray(book));
             book.Authors = GetAuthorString(GetAuthorArray(book));
             return book;
+        }
+
+        private MemberDetailsViewModel BuildMemberDetailsViewModel(Guid id)
+        {
+            Member member = db.Members.Find(id);
+            List<CollectionBooks> collectionBooks = db.CollectionBooks.Include("Collection").Where(cb => cb.Collection.MemberId == member.Id).ToList();
+            List<Book> books = new List<Book>();
+            foreach (CollectionBooks cb in collectionBooks)
+                books.Add(db.Books.Find(cb.BookId));
+            List<Review> reviews = db.Reviews.Include("Book").Where(r => r.MemberId == member.Id).ToList();
+            MemberDetailsViewModel viewModel = new MemberDetailsViewModel
+            {
+                Member = member,
+                Books = books,
+                Reviews = reviews
+            };
+            return viewModel;
+        }
+
+        private List<Member> GetFriendsList(Member member)
+        {
+            List<Member> friends = new List<Member>();
+            FriendList friendList = db.FriendLists.FirstOrDefault(l => l.Id == member.Id);
+            if (friendList != null)
+            {
+                List<FriendPair> pairs = db.FriendPairs.Include("Friend").Where(p => p.ListId == friendList.Id).ToList();
+                foreach (FriendPair pair in pairs)
+                    friends.Add(pair.Friend);
+            }
+            return friends;
+        }
+        private List<BookClub> GetBookClubs(Member member)
+        {
+            List<BookClub> clubs = new List<BookClub>();
+            List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.MemberId == member.Id).ToList();
+            foreach (ClubMembers cm in clubMembers)
+            {
+                BookClub club = db.BookClubs.Include("NextBook").FirstOrDefault(c => c.Id == cm.ClubId);
+                clubs.Add(club);
+            }
+            return clubs;
         }
     }
 }

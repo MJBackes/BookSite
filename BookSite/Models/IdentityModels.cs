@@ -35,6 +35,8 @@ namespace BookSite.Models
         public DbSet<BookAuthors> BookAuthors { get; set; }
         public DbSet<GenreTag> GenreTags { get; set; }
         public DbSet<BookTags> BookTags { get; set; }
+        public DbSet<FriendList> FriendLists { get; set; }
+        public DbSet<FriendPair> FriendPairs { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
