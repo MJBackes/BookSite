@@ -1,4 +1,5 @@
 ﻿using BookSite.Models;
+using BookSite.Models.MiscModels;
 using BookSite.Models.SiteModels;
 using BookSite.Models.ViewModels;
 using Microsoft.AspNet.Identity;
@@ -202,11 +203,89 @@ namespace BookSite.Controllers.SiteControllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
+        [HttpGet]
+        public ActionResult Search()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Search(MemberSearch search)
+        {
+            return RedirectToAction("SearchResults", search);
+        }
+        [HttpGet]
+        public ActionResult SearchResults(MemberSearch search)
+        {
+            return View(GetMembersFromSearchInput(search));
+        }
 
 
 
 
         //private methods
+
+        private List<Member> GetMembersFromSearchInput(MemberSearch search)
+        {
+            List<Member> members = new List<Member>();
+            if (search.MemberString != null && search.MemberString.Length > 0)
+            {
+                members = db.Members.Where(m => m.DisplayName.Contains(search.MemberString) || search.MemberString.Contains(m.DisplayName)).ToList();
+            }
+            if (search.ClubString != null && search.ClubString.Length > 0)
+            {
+                List<BookClub> clubs = db.BookClubs.Where(c => c.Name.Contains(search.ClubString) || search.ClubString.Contains(c.Name)).ToList();
+                members = members.Concat(GetMembersFromClubs(clubs)).ToList();
+            }
+            if (search.BookString != null && search.BookString.Length > 0)
+            {
+                List<Book> books = db.Books.Where(b => b.Title.Contains(search.BookString) || search.BookString.Contains(b.Title)).ToList();
+                members = members.Concat(GetMembersFromBooks(books)).ToList();
+            }
+            if (search.AuthorString != null && search.AuthorString.Length > 0)
+            {
+                List<Author> authors = db.Authors.Where(a => a.Name.Contains(search.AuthorString) || search.AuthorString.Contains(a.Name)).ToList();
+                members = members.Concat(GetMembersFromAuthors(authors)).ToList();
+            }
+            return members;
+        }
+
+        private List<Member> GetMembersFromClubs(List<BookClub> clubs)
+        {
+            List<Member> output = new List<Member>();
+            foreach(BookClub club in clubs)
+            {
+                List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.ClubId == club.Id).ToList();
+                foreach (ClubMembers cm in clubMembers)
+                    output.Add(db.Members.Find(cm.MemberId));
+            }
+            return output.Distinct().ToList();
+        }
+
+        private List<Member> GetMembersFromBooks(List<Book> books)
+        {
+            List<Member> output = new List<Member>();
+            foreach(Book book in books)
+            {
+                List<CollectionBooks> collectionBooks = db.CollectionBooks.Include("Collection").Where(cb => cb.BookId == book.Id).ToList();
+                foreach(CollectionBooks cb in collectionBooks)
+                {
+                    output.Add(db.Members.Find(cb.Collection.MemberId));
+                }
+            }
+            return output.Distinct().ToList();
+        }
+
+        private List<Member> GetMembersFromAuthors(List<Author> authors)
+        {
+            List<Book> books = new List<Book>();
+            foreach(Author author in authors)
+            {
+                List<BookAuthors> bookAuthors = db.BookAuthors.Include("Book").Where(ba => ba.AuthorId == author.Id).ToList();
+                foreach (BookAuthors ba in bookAuthors)
+                    books.Add(ba.Book);
+            }
+            return GetMembersFromBooks(books.Distinct().ToList());
+        }
 
         private List<Book> GetBookCollection(string userId)
         {

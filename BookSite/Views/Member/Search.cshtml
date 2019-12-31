@@ -1,0 +1,58 @@
+﻿@model BookSite.Models.MiscModels.MemberSearch
+
+@{
+    ViewBag.Title = "Search";
+}
+
+<h2>Search</h2>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <h4>Member Search</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <h4>Search for members by filling out one or more fields.</h4>
+    <label>Search by User Name</label>
+    <div class="form-group">
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.MemberString, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.MemberString, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <label>Search for members by the name of Book Clubs they are in.</label>
+    <div class="form-group">
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.ClubString, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.ClubString, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <label>Search for members by the names of books they have on their shelf.</label>
+    <div class="form-group">
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.BookString, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.BookString, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <label>Search for members by the names of Authors that have written books they have on their shelf.</label>
+    <div class="form-group">
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.AuthorString, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.AuthorString, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Search" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

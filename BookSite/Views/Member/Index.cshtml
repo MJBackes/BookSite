@@ -4,74 +4,73 @@
 }
 
 <h2>Index</h2>
-@Html.ActionLink("Search For A Book", "Search", "Book", null, new { @class="btn btn-primary"})
-@Html.ActionLink("Search For A Book Club", "Search", "Club", null, new { @class="btn btn-primary"})
-@Html.ActionLink("MyShelf", "MyShelf", "Member", null ,new { @class="btn btn-success"})
-@Html.ActionLink("Create a Book Club", "Create", "Club", null,new { @class = "btn btn-success" })
-
+@Html.ActionLink("Search For A Book", "Search", "Book", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Search For A Book Club", "Search", "Club", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Search For A Member", "Search", "Member", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("MyShelf", "MyShelf", "Member", null, new { @class = "btn btn-success" })
+@Html.ActionLink("Create a Book Club", "Create", "Club", null, new { @class = "btn btn-success" })
 @if (Model != null && Model.Clubs != null)
 {
-<table class="table-striped" width="100%">
-    <tr>
-        <th class="col-md-3">
-            Club Name
-        </th>
-        <th class="col-md-3">
-            Current Book
-        </th>
-        <th class="col-md-6">
-
-        </th>
-    </tr>
-    @foreach (BookSite.Models.SiteModels.BookClub club in Model.Clubs)
-    {
-       <tr>
-            <td>
-               @club.Name
-            </td>
-           <td>
-               @if (club.NextBook != null)
-               {
-               @club.NextBook.Title
-               }
-               else
-               {
-                   @Html.Raw("None");
-               }
-           </td>
-           <td style="text-align:center">
-               @Html.ActionLink("Home Page", "Index", "Club",new { id = club.Id}, new { @class = "btn btn-primary" })
-           </td>
-       </tr>
-    }
-</table>
-
-<h3>Friends</h3>
-<table class="table-striped" width="100%">
-    <tr>
-        <th class="col-md-3">
-            User Name
-        </th>
-        <th class="col-md-3">
-
-        </th>
-        <th class="col-md-6">
-
-        </th>
-    </tr>
-    @foreach (BookSite.Models.SiteModels.Member friend in Model.Friends)
-    {
+    <table class="table-striped" width="100%">
         <tr>
-            <td>
-                @Html.ActionLink(friend.DisplayName, "Details", "Member", new { id = friend.Id }, null)
-            </td>
-            <td>
+            <th class="col-md-3">
+                Club Name
+            </th>
+            <th class="col-md-3">
+                Current Book
+            </th>
+            <th class="col-md-6">
 
-            </td>
-            <td style="text-align:center">
-                @Html.ActionLink("Remove Friend", "RemoveFriend", "Member", new { id = friend.Id}, new { @class = "btn btn-danger"})
-            </td>
+            </th>
         </tr>
-    }
-</table>
+        @foreach (BookSite.Models.SiteModels.BookClub club in Model.Clubs)
+        {
+            <tr>
+                <td>
+                    @club.Name
+                </td>
+                <td>
+                    @if (club.NextBook != null)
+                    {
+                        @club.NextBook.Title
+                    }
+                    else
+                    {
+                        @Html.Raw("None");
+                    }
+                </td>
+                <td style="text-align:center">
+                    @Html.ActionLink("Home Page", "Index", "Club", new { id = club.Id }, new { @class = "btn btn-primary" })
+                </td>
+            </tr>
+        }
+    </table>
+
+    <h3>Friends</h3>
+    <table class="table-striped" width="100%">
+        <tr>
+            <th class="col-md-3">
+                User Name
+            </th>
+            <th class="col-md-3">
+
+            </th>
+            <th class="col-md-6">
+
+            </th>
+        </tr>
+        @foreach (BookSite.Models.SiteModels.Member friend in Model.Friends)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(friend.DisplayName, "Details", "Member", new { id = friend.Id }, null)
+                </td>
+                <td>
+                </td>
+                <td style="text-align:center">
+                    @Html.ActionLink("Remove Friend", "RemoveFriend", "Member", new { id = friend.Id }, new { @class = "btn btn-danger" })
+                </td>
+            </tr>
+        }
+    </table>
 }

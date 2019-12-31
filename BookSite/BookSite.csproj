@@ -203,6 +203,7 @@
     <Compile Include="Models\EmailModels\EmailModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\MiscModels\MemberSearch.cs" />
     <Compile Include="Models\SiteModels\FriendList.cs" />
     <Compile Include="Models\SiteModels\FriendPair.cs" />
     <Compile Include="Models\ViewModels\ClubIndexViewModel.cs" />
@@ -316,6 +317,8 @@
     <Content Include="Views\Discussion\Create.cshtml" />
     <Content Include="Views\Member\Details.cshtml" />
     <Content Include="Views\Member\RemoveFriend.cshtml" />
+    <Content Include="Views\Member\Search.cshtml" />
+    <Content Include="Views\Member\SearchResults.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
