@@ -367,6 +367,27 @@ namespace BookSite.Controllers.SiteControllers
                 BookDiscussions bookDiscussions = db.BookDiscussions.Include("Book").FirstOrDefault(bd => bd.DiscussionId == discussion.Id);
                 discussion.Book = bookDiscussions.Book;
             }
+            List<Book> books = new List<Book>();
+            foreach(Member m in viewModel.Members)
+            {
+                Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == m.Id);
+                if (collection != null)
+                {
+                    List<CollectionBooks> collectionBooks = db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == collection.Id).ToList();
+                    foreach (CollectionBooks cb in collectionBooks)
+                        books.Add(cb.Book);
+                }
+            }
+            var sortedBooks = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
+                Count = Books.Count(),
+                Key = googleId,
+                Value = Books.First()
+            }).OrderByDescending(g => g.Count);
+            viewModel.Books = new List<Book>();
+            for(int i = 0; i < sortedBooks.Count(); i++)
+            {
+                viewModel.Books.Add(sortedBooks.ElementAt(i).Value);
+            }
             return viewModel;
         }
     }

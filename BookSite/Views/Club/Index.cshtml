@@ -4,11 +4,11 @@
 }
 
 <h2>@Model.Club.Name</h2>
+@Html.ActionLink("Choose Next Book", "NewBookSearch", "Club", new { clubId = Model.Club.Id }, new { @class = "btn btn-primary" })
 @if (Model.IsManager)
 {
-@Html.ActionLink("Edit Club", "Edit", "Club", new { id = Model.Club.Id }, null)
+    @Html.ActionLink("Edit Club", "Edit", "Club", new { id = Model.Club.Id }, null)
 }
-@Html.ActionLink("Choose Next Book", "NewBookSearch", "Club",new { clubId = Model.Club.Id},new { @class = "btn btn-primary"})
 <h3>Members</h3>
 <table class="table-striped" width="100%">
     <tr>
@@ -18,7 +18,7 @@
         <th class="col-md-8">
         </th>
     </tr>
-    @foreach(BookSite.Models.SiteModels.Member member in Model.Members)
+    @foreach (BookSite.Models.SiteModels.Member member in Model.Members)
     {
         <tr>
             <td>
@@ -49,9 +49,9 @@
 
         </th>
     </tr>
-    @if(Model.Discussions != null && Model.Discussions.Count > 0)
+    @if (Model.Discussions != null && Model.Discussions.Count > 0)
     {
-        foreach(BookSite.Models.SiteModels.Discussion discussion in Model.Discussions)
+        foreach (BookSite.Models.SiteModels.Discussion discussion in Model.Discussions)
         {
             <tr>
                 <td>
@@ -74,15 +74,15 @@
                     @discussion.StartTime.ToShortTimeString()
                 </td>
                 <td>
-                    @if(Model.IsManager && !discussion.HasStarted)
+                    @if (Model.IsManager && !discussion.HasStarted)
                     {
-                        @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.Id})
+                        @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.Id })
                     }
                 </td>
                 <td>
                     @if ((discussion.StartTime - DateTime.Now).TotalMinutes < 5 && !discussion.HasStarted)
                     {
-                        @Html.ActionLink("Start", "GoLive", "Discussion", new { id = discussion.Id}, new { @class = "btn btn-success" })
+                        @Html.ActionLink("Start", "GoLive", "Discussion", new { id = discussion.Id }, new { @class = "btn btn-success" })
                     }
                 </td>
             </tr>
@@ -100,3 +100,30 @@
         </tr>
     }
 </table>
+@if (Model.Books.Count > 0)
+{
+    <h3>Most common books on the shelves of members of @Model.Club.Name:</h3>
+    <div id="shelfCarousel" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner" style="height: 200px">
+            @for (int i = 0; (i < Model.Books.Count && i < 5); i++)
+            {
+                <div class="item @if (i == 0) {@Html.Raw("active")}">
+                    <img src="@Model.Books[i].Thumbnail" alt="@Model.Books[i].Title">
+                    <div class="carousel-caption">
+                        <h4 style="color: black">@Model.Books[i].Title</h4>
+                        @Html.ActionLink("Link", "Details", "Book", new { id = Model.Books[i].Id }, null)
+                    </div>
+                </div>
+            }
+        </div>
+        <a class="left carousel-control" href="#shelfCarousel" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#shelfCarousel" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+
+    </div>
+}
