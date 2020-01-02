@@ -28,9 +28,10 @@ namespace BookSite
                 BookId = Guid.Parse(bookId),
                 TimeOfPost = now
             };
+            string userImage = db.Members.Find(Guid.Parse(memberId)).UserImage;
             db.Comments.Add(comment);
             db.SaveChanges();
-            await Clients.All.addNewMessageToPage(name, message, now.ToShortDateString(), now.ToShortTimeString());
+            await Clients.All.addNewMessageToPage(name, message, now.ToShortDateString(), now.ToShortTimeString(), memberId, userImage);
         }
     }
 }

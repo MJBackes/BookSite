@@ -3,6 +3,7 @@ using BookSite.Models;
 using BookSite.Models.APIResponseModels;
 using BookSite.Models.MiscModels;
 using BookSite.Models.SiteModels;
+using BookSite.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +30,8 @@ namespace BookSite.Controllers.SiteControllers
         [HttpGet]
         public ActionResult Details(string id)
         {
-            Book book = ParseSingleSearchResponse(GoogleBooksAPIHandler.SingleSearch(id).Result);
-            ViewBag.Reviews = db.Reviews.Include("Member").Where(r => r.BookId == book.Id).ToList();
-            return View(book);
+            BookDetailsViewModel viewModel = GetBookDetailsViewModel(id);
+            return View(viewModel);
         }
 
         [HttpGet]
@@ -192,6 +192,37 @@ namespace BookSite.Controllers.SiteControllers
                         output.Append(" , ");
                 }
             return output.ToString();
+        }
+        private BookDetailsViewModel GetBookDetailsViewModel(string id)
+        {
+            BookDetailsViewModel viewModel = new BookDetailsViewModel();
+            viewModel.Book = ParseSingleSearchResponse(GoogleBooksAPIHandler.SingleSearch(id).Result);
+            viewModel.Reviews = db.Reviews.Include("Member").Where(r => r.BookId == viewModel.Book.Id).ToList();
+            viewModel.RelatedBooks = GetRelatedBooks(viewModel.Book);
+            return viewModel;
+        }
+        private List<Book> GetRelatedBooks(Book book)
+        {
+            List<Collection> collections = db.CollectionBooks.Include("Collection")
+                                                             .Where(cb => cb.BookId == book.Id)
+                                                             .Select(cb => cb.Collection)
+                                                             .ToList();
+            List<Book> books = new List<Book>();
+            foreach(Collection c in collections)
+            {
+                books = books.Concat(db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == c.Id).Select(cb => cb.Book)).ToList();
+            }
+            books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
+                {
+                    Key = googleId,
+                    Count = Books.Count(),
+                    Value = Books.First()
+                }).OrderByDescending(g => g.Count)
+                  .Select(g => g.Value)
+                  .Take(6)
+                  .ToList();
+            books.Remove(book);
+            return books;
         }
     }
 }

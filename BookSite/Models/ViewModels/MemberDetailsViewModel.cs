@@ -11,6 +11,6 @@ namespace BookSite.Models.ViewModels
         public Member Member { get; set; }
         public List<Review> Reviews { get; set; } 
         public List<Book> Books { get; set; }
-
+        public bool isFriend { get; set; }
     }
 }

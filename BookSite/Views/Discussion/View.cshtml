@@ -16,7 +16,8 @@
                 <tr>
                     <td class="col-md-3">
                         <p>@(comment.TimeOfPost.ToShortDateString() + " " + comment.TimeOfPost.ToShortTimeString())</p>
-                        <p style="color:aqua; font-size: 18px">@comment.Member.DisplayName</p>
+                        <img style="height:100px; width:100px"src="@comment.Member.UserImage"/>
+                        @Html.ActionLink(comment.Member.DisplayName, "Details", "Member", new { id = comment.Member.Id },new { style = "color:aqua; font-size: 18px"})
                     </td>
                     <td class="col-md-9">
                             @foreach(string line in comment.Body.Split('\n'))
@@ -43,10 +44,12 @@
             var name = "@Model.Member.DisplayName";
             var discussionId = "@Model.Discussion.Id";
             var memberId = "@Model.Member.Id";
-            var bookId = "@Model.Book.Id"
-            chat.client.addNewMessageToPage = function (name, message, date, time) {
+            var bookId = "@Model.Book.Id";
+            chat.client.addNewMessageToPage = function (name, message, date, time, id, userImage) {
                 $('#discussion').append("<tr>" +
-                                            "<td class='col-md-3'><p>" + date + " " + time + "</p>" + "<p style='color:aqua; font-size: 18px'>" + name + "</p>" + 
+                                            "<td class='col-md-3'><p>" + date + " " + time + "</p>" +
+                                            "<img style='height:100px; width:100px'src='" + userImage + "' + />" + 
+                                            "<a style = 'color:aqua; font-size: 18px' href = '/Member/Details/" + id + "'>" + name + "</a>" + 
                                             "</td>" + 
                                             "<td class='col-md-9'>" + message + 
                                             "</td>" + 
@@ -70,5 +73,8 @@
     }
     table{
         table-layout:fixed;
+    }
+    img{
+        display:block;
     }
 </style>

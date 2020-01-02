@@ -39,8 +39,18 @@
         </div>
 
         <div class="form-group">
+            @Html.LabelFor(model => model.UserImage, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.UserImage, new { id = "imageTextBox", style = "visibility: hidden" })
+                <canvas hidden id='canvas'></canvas>
+                <img id='imgView' src="~/Content/Images/defaultAvatar.png">
+                <input type='file' onchange='imgChosen(event)' name='img' id='image'>
+            </div>
+        </div>
+
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input id ="submitBtn" type="submit" value="Create" class="btn btn-default" />
             </div>
         </div>
     </div>
@@ -49,3 +59,35 @@
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
+@section scripts{
+<script>
+    $(document).on("click", "#submitBtn", function (event) {
+            $("#imageTextBox").val(convertToBase64String(document.getElementById("imgView")));
+    });
+    	function imgChosen(event){
+		    var file = event.target.files[0];
+		    var fReader = new FileReader();
+		    var imageEle = document.getElementById("imgView");
+		    fReader.onload = function(event){
+			    imageEle.src = event.target.result;
+		    };
+		    fReader.readAsDataURL(file);
+    }
+    	function convertToBase64String(img){
+		var canvas = document.getElementById('canvas');
+		var context = canvas.getContext("2d");
+		context.drawImage(img,0,0,img.naturalWidth,img.naturalHeight,0,0,canvas.width,canvas.height);
+		var dURL = canvas.toDataURL("image/png");
+		return dURL;
+	}
+</script>
+    }
+<style>
+    img{
+        width:150px;
+        height:150px;
+    }
+    canvas{
+        display:none;
+    }
+</style>

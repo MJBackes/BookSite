@@ -18,7 +18,10 @@
             @Html.DisplayFor(model => model.Member.DisplayName)
         </dd>
     </dl>
-    @Html.ActionLink("Add as Friend", "AddFriend", "Member", new { id = Model.Member.Id},new { @class="btn btn-success"})
+    @if (!Model.isFriend)
+    {
+    @Html.ActionLink("Add as Friend", "AddFriend", "Member", new { id = Model.Member.Id }, new { @class = "btn btn-success" })
+    }
     <h3>Shelf</h3>
     @if (Model.Books.Count > 0)
     {

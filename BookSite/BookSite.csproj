@@ -214,6 +214,7 @@
     <Compile Include="Models\MiscModels\MemberSearch.cs" />
     <Compile Include="Models\SiteModels\FriendList.cs" />
     <Compile Include="Models\SiteModels\FriendPair.cs" />
+    <Compile Include="Models\ViewModels\BookDetailsViewModel.cs" />
     <Compile Include="Models\ViewModels\ClubIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\MemberDetailsViewModel.cs" />
     <Compile Include="Models\ViewModels\MemberIndexViewModel.cs" />

@@ -45,8 +45,6 @@ namespace BookSite.Controllers.SiteControllers
         {
             try
             {
-                if ((viewModel.Date - DateTime.Now).Ticks < 0)
-                    return View(viewModel);
                 DateTime Start = new DateTime
                     (
                     viewModel.Date.Year,
@@ -56,6 +54,8 @@ namespace BookSite.Controllers.SiteControllers
                     viewModel.StartTime.Minute,
                     0
                     );
+                if ((Start - DateTime.Now).Ticks < 0)
+                    return View(viewModel);
                 Discussion discussion = new Discussion
                 {
                     Id = Guid.NewGuid(),
@@ -190,7 +190,7 @@ namespace BookSite.Controllers.SiteControllers
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
             Discussion discussion = db.Discussions.FirstOrDefault(d => d.Id == id);
             Book book = db.BookDiscussions.Include("Book").FirstOrDefault(bd => bd.DiscussionId == discussion.Id).Book;
-            List<Comment> comments = db.Comments.Where(c => c.DiscussionId == discussion.Id).OrderBy(c => c.TimeOfPost).ToList();
+            List<Comment> comments = db.Comments.Include("Member").Where(c => c.DiscussionId == discussion.Id).OrderBy(c => c.TimeOfPost).ToList();
             ViewDiscussionViewModel viewModel = new ViewDiscussionViewModel
             {
                 Member = member,

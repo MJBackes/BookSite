@@ -18,6 +18,7 @@ namespace BookSite.Models.SiteModels
         [Required]
         [Display(Name = "Display Name")]
         public string DisplayName { get; set; }
+        [Display(Name = "User Image")]
         public string UserImage { get; set; }
         [ForeignKey("ApplicationUser")]
         public string ApplicationUserId { get; set; }
