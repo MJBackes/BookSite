@@ -351,24 +351,40 @@ namespace BookSite.Controllers.SiteControllers
         }
         private ClubIndexViewModel GetClubIndexViewModel(BookClub club)
         {
-            var userId = User.Identity.GetUserId();
-            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
             ClubIndexViewModel viewModel = new ClubIndexViewModel { Club = club, Discussions = new List<Discussion>(), Members = new List<Member>() };
-            List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.ClubId == club.Id).ToList();
+            AddMembersToClubIndexViewModel(viewModel);
+            AddDiscussionsToClubIndexViewModel(viewModel);
+            AddBooksToClubIndexViewModel(viewModel);
+            return viewModel;
+        }
+
+        private void AddMembersToClubIndexViewModel(ClubIndexViewModel viewModel)
+        {
+            var userId = User.Identity.GetUserId();
+            List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.ClubId == viewModel.Club.Id).ToList();
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
             foreach (ClubMembers cm in clubMembers)
             {
                 viewModel.Members.Add(db.Members.Find(cm.MemberId));
                 if (cm.MemberId == member.Id && cm.IsManager)
                     viewModel.IsManager = true;
             }
-            viewModel.Discussions = db.Discussions.Where(d => d.ClubId == club.Id).ToList();
+        }
+
+        private void AddDiscussionsToClubIndexViewModel(ClubIndexViewModel viewModel)
+        {
+            viewModel.Discussions = db.Discussions.Where(d => d.ClubId == viewModel.Club.Id).ToList();
             foreach (Discussion discussion in viewModel.Discussions)
             {
                 BookDiscussions bookDiscussions = db.BookDiscussions.Include("Book").FirstOrDefault(bd => bd.DiscussionId == discussion.Id);
                 discussion.Book = bookDiscussions.Book;
             }
+        }
+
+        private void AddBooksToClubIndexViewModel(ClubIndexViewModel viewModel)
+        {
             List<Book> books = new List<Book>();
-            foreach(Member m in viewModel.Members)
+            foreach (Member m in viewModel.Members)
             {
                 Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == m.Id);
                 if (collection != null)
@@ -384,11 +400,10 @@ namespace BookSite.Controllers.SiteControllers
                 Value = Books.First()
             }).OrderByDescending(g => g.Count);
             viewModel.Books = new List<Book>();
-            for(int i = 0; i < sortedBooks.Count(); i++)
+            for (int i = 0; i < sortedBooks.Count(); i++)
             {
                 viewModel.Books.Add(sortedBooks.ElementAt(i).Value);
             }
-            return viewModel;
         }
     }
 }
