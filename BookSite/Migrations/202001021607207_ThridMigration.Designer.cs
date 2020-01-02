@@ -7,13 +7,13 @@ namespace BookSite.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class ThirdMigration : IMigrationMetadata
+    public sealed partial class ThridMigration : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ThirdMigration));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ThridMigration));
         
         string IMigrationMetadata.Id
         {
-            get { return "201912311657471_ThirdMigration"; }
+            get { return "202001021607207_ThridMigration"; }
         }
         
         string IMigrationMetadata.Source

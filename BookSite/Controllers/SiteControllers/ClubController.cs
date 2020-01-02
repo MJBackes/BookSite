@@ -383,17 +383,7 @@ namespace BookSite.Controllers.SiteControllers
 
         private void AddBooksToClubIndexViewModel(ClubIndexViewModel viewModel)
         {
-            List<Book> books = new List<Book>();
-            foreach (Member m in viewModel.Members)
-            {
-                Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == m.Id);
-                if (collection != null)
-                {
-                    List<CollectionBooks> collectionBooks = db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == collection.Id).ToList();
-                    foreach (CollectionBooks cb in collectionBooks)
-                        books.Add(cb.Book);
-                }
-            }
+            List<Book> books = GetBooksForClubIndexViewModel(viewModel.Members);
             var sortedBooks = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
                 Count = Books.Count(),
                 Key = googleId,
@@ -404,6 +394,22 @@ namespace BookSite.Controllers.SiteControllers
             {
                 viewModel.Books.Add(sortedBooks.ElementAt(i).Value);
             }
+        }
+
+        private List<Book> GetBooksForClubIndexViewModel(List<Member> members) 
+        {
+            List<Book> books = new List<Book>();
+            foreach (Member m in members)
+            {
+                Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == m.Id);
+                if (collection != null)
+                {
+                    List<CollectionBooks> collectionBooks = db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == collection.Id).ToList();
+                    foreach (CollectionBooks cb in collectionBooks)
+                        books.Add(cb.Book);
+                }
+            }
+            return books;
         }
     }
 }

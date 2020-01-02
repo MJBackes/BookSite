@@ -3,7 +3,7 @@ namespace BookSite.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class ThirdMigration : DbMigration
+    public partial class ThridMigration : DbMigration
     {
         public override void Up()
         {
@@ -81,6 +81,7 @@ namespace BookSite.Migrations
                         Date = c.DateTime(nullable: false),
                         StartTime = c.DateTime(nullable: false),
                         HasStarted = c.Boolean(nullable: false),
+                        HasEnded = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.BookClubs", t => t.ClubId, cascadeDelete: true)

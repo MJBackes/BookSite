@@ -57,7 +57,7 @@
                 <td>
                     @if (discussion.HasStarted)
                     {
-                        @Html.ActionLink(discussion.Name, "View", "Discussion", new { id = discussion.Id })
+                        @Html.ActionLink(discussion.Name, "View", "Discussion", new { id = discussion.Id }, null)
                     }
                     else
                     {
@@ -76,13 +76,17 @@
                 <td>
                     @if (Model.IsManager && !discussion.HasStarted)
                     {
-                        @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.Id })
+                        @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.Id } , null)
                     }
                 </td>
                 <td>
                     @if ((discussion.StartTime - DateTime.Now).TotalMinutes < 5 && !discussion.HasStarted)
                     {
                         @Html.ActionLink("Start", "GoLive", "Discussion", new { id = discussion.Id }, new { @class = "btn btn-success" })
+                    }
+                    else if(discussion.HasStarted && !discussion.HasEnded && Model.IsManager)
+                    {
+                        @Html.ActionLink("End", "Close", "Discussion", new { id = discussion.Id}, new { @class = "btn btn-danger"})
                     }
                 </td>
             </tr>

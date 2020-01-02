@@ -9,6 +9,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 
 namespace BookSite.Controllers.SiteControllers
 {
@@ -81,20 +82,32 @@ namespace BookSite.Controllers.SiteControllers
         }
 
         // GET: Discussion/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(Guid id)
         {
-            return View();
+            return View(db.Discussions.Find(id));
         }
 
         // POST: Discussion/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(Discussion discussion)
         {
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                Discussion discussionFromDb = db.Discussions.Find(discussion.Id);
+                discussionFromDb.Name = discussion.Name;
+                DateTime Start = new DateTime
+                    (
+                    discussion.Date.Year,
+                    discussion.Date.Month,
+                    discussion.Date.Day,
+                    discussion.StartTime.Hour,
+                    discussion.StartTime.Minute,
+                    0
+                    );
+                discussionFromDb.StartTime = Start;
+                discussionFromDb.Date = Start.Date;
+                db.SaveChanges();
+                return RedirectToAction("Index", "Club", discussion.ClubId);
             }
             catch
             {
@@ -129,12 +142,23 @@ namespace BookSite.Controllers.SiteControllers
             Discussion discussion = db.Discussions.Find(id);
             //NotifyMembers(discussion);
             discussion.HasStarted = true;
-            return RedirectToAction("View", id);
+            db.SaveChanges();
+            return RedirectToAction("View", new { id = id });
+        }
+        [HttpGet]
+        public ActionResult Close(Guid id)
+        {
+            Discussion discussion = db.Discussions.Find(id);
+            discussion.HasEnded = true;
+            db.SaveChanges();
+            return RedirectToAction("Index", "Club", new { id = discussion.ClubId });
         }
         [HttpGet]
         public ActionResult View(Guid id)
         {
-            return View();
+            var userId = User.Identity.GetUserId();
+            ViewDiscussionViewModel viewModel = GetViewDiscussionViewModel(userId, id);
+            return View(viewModel);
         }
 
         //private methods
@@ -159,6 +183,22 @@ namespace BookSite.Controllers.SiteControllers
                 Subject = $"The Book Discussion {discussion.Name} has just started!",
                 Message = $"{member.FirstName}, \n\n A book club you are a memeber of just began their discussion of {discussion.Book.Title}. Go to \n {URL} \n to participate."
             };
+        }
+
+        private ViewDiscussionViewModel GetViewDiscussionViewModel(string userId, Guid id)
+        {
+            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            Discussion discussion = db.Discussions.FirstOrDefault(d => d.Id == id);
+            Book book = db.BookDiscussions.Include("Book").FirstOrDefault(bd => bd.DiscussionId == discussion.Id).Book;
+            List<Comment> comments = db.Comments.Where(c => c.DiscussionId == discussion.Id).OrderBy(c => c.TimeOfPost).ToList();
+            ViewDiscussionViewModel viewModel = new ViewDiscussionViewModel
+            {
+                Member = member,
+                Book = book,
+                Discussion = discussion,
+                Comments = comments
+            };
+            return viewModel;
         }
     }
 }

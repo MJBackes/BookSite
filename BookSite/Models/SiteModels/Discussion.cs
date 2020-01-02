@@ -24,6 +24,7 @@ namespace BookSite.Models.SiteModels
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:hh:mm tt}")]
         public DateTime StartTime { get; set; }
         public bool HasStarted { get; set; }
+        public bool HasEnded { get; set; }
         [NotMapped]
         public Book Book { get; set; }
     }
