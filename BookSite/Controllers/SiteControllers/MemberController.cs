@@ -1,4 +1,5 @@
-﻿using BookSite.Models;
+﻿using BookSite.APIHandlers;
+using BookSite.Models;
 using BookSite.Models.MiscModels;
 using BookSite.Models.SiteModels;
 using BookSite.Models.ViewModels;
@@ -30,10 +31,7 @@ namespace BookSite.Controllers.SiteControllers
                 return RedirectToAction("Create");
             if (member != null)
             {
-                MemberIndexViewModel viewModel = new MemberIndexViewModel { MemberId = member.Id, Clubs = new List<BookClub>() };
-                viewModel.Clubs = GetBookClubs(member);
-                viewModel.Friends = GetFriendsList(member);
-                viewModel.FriendsBooks = GetFriendsBooks(viewModel.Friends, db.Collections.FirstOrDefault(c => c.MemberId == member.Id));
+                MemberIndexViewModel viewModel = BuildMemberIndexViewModel(member);
                 return View(viewModel);
             }
             return View();
@@ -411,6 +409,147 @@ namespace BookSite.Controllers.SiteControllers
             }
             return output;
         }
+        private List<Book> GetRecommendations(Member member)
+        {
+            return GetRelatedRecommendations(GetShelfBooks(member)).Take(5).ToList();
+        }
+        private List<Book> GetAuthorBooks(Member member)
+        {
+            List<Book> books = GetShelfBooks(member);
+            return GetBooksByAuthor(GetMostCommonAuthors(books)).Take(5).ToList();
+        }
+        private List<Book> GetSubjectBooks(Member member)
+        {
+            List<Book> books = GetShelfBooks(member);
+            return GetBooksBySubject(GetMostCommonSubjects(books)).Take(5).ToList();
+        }
+        private List<Book> GetRelatedRecommendations(List<Book> shelfBooks)
+        {
+            List<Book> recomendations = new List<Book>();
+            foreach(Book book in shelfBooks)
+            {
+                recomendations = recomendations.Concat(GetRelatedBooks(book)).ToList();
+            }
+            recomendations = recomendations.GroupBy(b => b.GoogleVolumeId, (googleId, books) => new
+            {
+                Key = googleId,
+                Count = books.Count(),
+                Value = books.First()
+            }).OrderByDescending(g => g.Count)
+              .Select(g => g.Value)
+              .ToList();
+            foreach(Book book in shelfBooks)
+            {
+                recomendations.Remove(book);
+            }
+            return recomendations;
+        }
+        private List<Book> GetBooksBySubject(List<string> subjects)
+        {
+            List<Book> SubjectBooks = new List<Book>();
+            foreach(string subject in subjects)
+            {
+                SubjectBooks = SubjectBooks.Concat(Utilities.GoogleBookSearchUtilities.ParseSearchResponse(GoogleBooksAPIHandler.FullSearch(new Search {subject = subject }))).ToList();
+            }
+            return SubjectBooks.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
+            {
+                Key = googleId,
+                Count = Books.Count(),
+                Value = Books.First()
+            }).OrderByDescending(g => g.Count)
+              .Select(g => g.Value)
+              .ToList();
+        }
+        private List<Book> GetBooksByAuthor(List<Author> authors)
+        {
+            List<Book> AuthorBooks = new List<Book>();
+            foreach(Author author in authors)
+            {
+                AuthorBooks = AuthorBooks.Concat(Utilities.GoogleBookSearchUtilities.ParseSearchResponse(GoogleBooksAPIHandler.FullSearch(new Search { inauthor = author.Name }))).ToList();
+            }
+            return AuthorBooks.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
+            {
+                Key = googleId,
+                Count = Books.Count(),
+                Value = Books.First()
+            }).OrderByDescending(g => g.Count)
+              .Select(g => g.Value)
+              .ToList();
+        }
+        private List<Book> GetShelfBooks(Member member)
+        {
+            return db.CollectionBooks.Include("Collection")
+                                     .Where(cb => cb.Collection.MemberId == member.Id)
+                                     .Select(cb => cb.Book)
+                                     .ToList();
+        }
+        private List<string> GetMostCommonSubjects(List<Book> books)
+        {
+            List<GenreTag> tags = new List<GenreTag>();
+            foreach(Book book in books)
+            {
+                tags = tags.Concat(db.BookTags.Include("GenreTag")
+                                              .Where(bt => bt.BookId == book.Id)
+                                              .Select(bt => bt.GenreTag))
+                                              .ToList();
+            }
+            var groupings = tags.GroupBy(t => t.Id, (id, Tags) => new
+            {
+                Key = id,
+                Count = Tags.Count(),
+                Value = Tags.First()
+            });
+            
+            return groupings.Where(g => g.Count == groupings.Max(gr => gr.Count))
+                            .Select(g => g.Value.Name)
+                            .ToList();
+        }
+        private List<Author> GetMostCommonAuthors(List<Book> books)
+        {
+            List<Author> authors = new List<Author>();
+            foreach(Book book in books)
+            {
+                authors = authors.Concat(db.BookAuthors.Include("Author")
+                                                       .Where(ba => ba.BookId == book.Id)
+                                                       .Select(ba => ba.Author))
+                                                       .ToList();
+            }
+            var groupings = authors.GroupBy(a => a.Id, (id, Authors) => new
+            {
+                Key = id,
+                Count = Authors.Count(),
+                Value = Authors.First()
+            });
+            return groupings.Where(g => g.Count == groupings.Max(gr => gr.Count))
+                            .Select(g => g.Value)
+                            .ToList();
+        }
+        private List<Book> GetRelatedBooks(Book book)
+        {
+            List<Collection> collections = db.CollectionBooks.Include("Collection")
+                                                             .Where(cb => cb.BookId == book.Id)
+                                                             .Select(cb => cb.Collection)
+                                                             .ToList();
+            List<Book> books = new List<Book>();
+            foreach (Collection c in collections)
+            {
+                books = books.Concat(db.CollectionBooks.Include("Book")
+                                                       .Where(cb => cb.CollectionId == c.Id)
+                                                       .Select(cb => cb.Book))
+                                                       .ToList();
+            }
+            books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
+            {
+                Key = googleId,
+                Count = Books.Count(),
+                Value = Books.First()
+            }).OrderByDescending(g => g.Count)
+                  .Select(g => g.Value)
+                  .Take(6)
+                  .ToList();
+            books.Remove(book);
+            return books;
+        }
         private List<BookClub> GetBookClubs(Member member)
         {
             List<BookClub> clubs = new List<BookClub>();
@@ -421,6 +560,17 @@ namespace BookSite.Controllers.SiteControllers
                 clubs.Add(club);
             }
             return clubs;
+        }
+        private MemberIndexViewModel BuildMemberIndexViewModel(Member member)
+        {
+            MemberIndexViewModel viewModel = new MemberIndexViewModel { MemberId = member.Id };
+            viewModel.Clubs = GetBookClubs(member);
+            viewModel.Friends = GetFriendsList(member);
+            viewModel.FriendsBooks = GetFriendsBooks(viewModel.Friends, db.Collections.FirstOrDefault(c => c.MemberId == member.Id));
+            viewModel.Recommendations = GetRecommendations(member);
+            viewModel.AuthorBooks = GetAuthorBooks(member);
+            viewModel.SubjectBooks = GetSubjectBooks(member);
+            return viewModel;
         }
     }
 }

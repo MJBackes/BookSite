@@ -73,11 +73,91 @@
             </tr>
         }
     </table>
+    if (Model.Recommendations.Count > 0)
+    {
+        <h3>Recommendations based on the books on your shelf:</h3>
+        <div id="recommendCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" style="height: 200px">
+                @for (int i = 0; (i < Model.Recommendations.Count && i < 5); i++)
+                {
+                    <div class="item @if (i == 0) {@Html.Raw("active")}">
+                        <img src="@Model.Recommendations[i].Thumbnail" alt="@Model.Recommendations[i].Title">
+                        <div class="carousel-caption">
+                            <h4 style="color: black">@Model.Recommendations[i].Title</h4>
+                            @Html.ActionLink("Link", "Details", "Book", new { id = Model.Recommendations[i].GoogleVolumeId }, null)
+                        </div>
+                    </div>
+                }
+            </div>
+            <a class="left carousel-control" href="#recommendCarousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#recommendCarousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
 
+        </div>
+    }
+    if (Model.AuthorBooks.Count > 0)
+    {
+        <h3>More by authors you know:</h3>
+        <div id="authorCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" style="height: 200px">
+                @for (int i = 0; (i < Model.AuthorBooks.Count && i < 5); i++)
+                {
+                    <div class="item @if (i == 0) {@Html.Raw("active")}">
+                        <img src="@Model.AuthorBooks[i].Thumbnail" alt="@Model.AuthorBooks[i].Title">
+                        <div class="carousel-caption">
+                            <h4 style="color: black">@Model.AuthorBooks[i].Title</h4>
+                            @Html.ActionLink("Link", "Details", "Book", new { id = Model.AuthorBooks[i].GoogleVolumeId }, null)
+                        </div>
+                    </div>
+                }
+            </div>
+            <a class="left carousel-control" href="#authorCarousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#authorCarousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+
+        </div>
+    }
+    if (Model.SubjectBooks.Count > 0)
+    {
+        <h3>Recommendations based on Subjects/Genres you know:</h3>
+        <div id="subjectCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" style="height: 200px">
+                @for (int i = 0; (i < Model.SubjectBooks.Count && i < 5); i++)
+                {
+                    <div class="item @if (i == 0) {@Html.Raw("active")}">
+                        <img src="@Model.SubjectBooks[i].Thumbnail" alt="@Model.SubjectBooks[i].Title">
+                        <div class="carousel-caption">
+                            <h4 style="color: black">@Model.SubjectBooks[i].Title</h4>
+                            @Html.ActionLink("Link", "Details", "Book", new { id = Model.SubjectBooks[i].GoogleVolumeId }, null)
+                        </div>
+                    </div>
+                }
+            </div>
+            <a class="left carousel-control" href="#subjectCarousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#subjectCarousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+
+        </div>
+    }
     if (Model.FriendsBooks.Count > 0)
     {
         <h3>Recomendations based on your friends shelves:</h3>
-        <div id="shelfCarousel" class="carousel slide" data-ride="carousel">
+        <div id="friendCarousel" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner" style="height: 200px">
                 @for (int i = 0; (i < Model.FriendsBooks.Count && i < 5); i++)
                 {
@@ -90,11 +170,11 @@
                     </div>
                 }
             </div>
-            <a class="left carousel-control" href="#shelfCarousel" role="button" data-slide="prev">
+            <a class="left carousel-control" href="#friendCarousel" role="button" data-slide="prev">
                 <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
                 <span class="sr-only">Previous</span>
             </a>
-            <a class="right carousel-control" href="#shelfCarousel" role="button" data-slide="next">
+            <a class="right carousel-control" href="#friendCarousel" role="button" data-slide="next">
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
             </a>

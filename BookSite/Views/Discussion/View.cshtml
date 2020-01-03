@@ -46,7 +46,6 @@
             var memberId = "@Model.Member.Id";
             var bookId = "@Model.Book.Id";
             chat.client.addNewMessageToPage = function (name, message, date, time, id, userImage) {
-
                 $('#discussion').append("<tr>" +
                                             "<td class='col-md-3'><p>" + date + " " + time + "</p>" +
                                             "<img style='height:100px; width:100px'src='" + userImage + "' + />" + 
