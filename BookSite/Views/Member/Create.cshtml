@@ -33,6 +33,10 @@
         <div class="form-group">
             @Html.LabelFor(model => model.DisplayName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
+                @if (Model != null && Model.NameIsTaken)
+                {
+                    <span style="color:orangered">That name is already taken.</span>
+                }
                 @Html.EditorFor(model => model.DisplayName, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.DisplayName, "", new { @class = "text-danger" })
             </div>

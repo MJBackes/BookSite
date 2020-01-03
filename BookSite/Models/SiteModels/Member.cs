@@ -23,5 +23,7 @@ namespace BookSite.Models.SiteModels
         [ForeignKey("ApplicationUser")]
         public string ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
+        [NotMapped]
+        public bool NameIsTaken { get; set; }
     }
 }

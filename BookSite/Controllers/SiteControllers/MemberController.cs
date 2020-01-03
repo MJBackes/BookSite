@@ -60,6 +60,11 @@ namespace BookSite.Controllers.SiteControllers
         {
             try
             {
+                if (db.Members.FirstOrDefault(m => m.DisplayName == member.DisplayName) != null)
+                {
+                    member.NameIsTaken = true;
+                    return View(member);
+                }
                 member.Id = Guid.NewGuid();
                 var userId = User.Identity.GetUserId();
                 member.ApplicationUserId = userId;
