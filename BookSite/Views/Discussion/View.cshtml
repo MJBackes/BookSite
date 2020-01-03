@@ -46,14 +46,15 @@
             var memberId = "@Model.Member.Id";
             var bookId = "@Model.Book.Id";
             chat.client.addNewMessageToPage = function (name, message, date, time, id, userImage) {
+
                 $('#discussion').append("<tr>" +
                                             "<td class='col-md-3'><p>" + date + " " + time + "</p>" +
                                             "<img style='height:100px; width:100px'src='" + userImage + "' + />" + 
                                             "<a style = 'color:aqua; font-size: 18px' href = '/Member/Details/" + id + "'>" + name + "</a>" + 
                                             "</td>" + 
-                                            "<td class='col-md-9'>" + message + 
-                                            "</td>" + 
-                                        "</tr>");
+                                            "<td class='col-md-9'>" + breakLinesInMessage(message) + 
+                                            "</td>" +
+                                            "</tr>");
             };
             $('#message').focus();
             $.connection.hub.start().done(function () {
@@ -63,6 +64,14 @@
                 });
             });
         });
+        function breakLinesInMessage(message) {
+            let output = "";
+            let lines = message.split(/\r?\n/g);
+            for (let i = 0; i < lines.length; i++) {
+                output += ("<p>" + lines[i] + "</p>");
+            }
+            return output;
+        }
     </script>
 }
 <style>

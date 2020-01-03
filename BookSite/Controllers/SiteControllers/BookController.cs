@@ -210,7 +210,10 @@ namespace BookSite.Controllers.SiteControllers
             List<Book> books = new List<Book>();
             foreach(Collection c in collections)
             {
-                books = books.Concat(db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == c.Id).Select(cb => cb.Book)).ToList();
+                books = books.Concat(db.CollectionBooks.Include("Book")
+                                                       .Where(cb => cb.CollectionId == c.Id)
+                                                       .Select(cb => cb.Book))
+                                                       .ToList();
             }
             books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
                 {

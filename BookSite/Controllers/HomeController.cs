@@ -1,14 +1,20 @@
 ﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-
+using BookSite.Models;
 namespace BookSite.Controllers
 {
     public class HomeController : Controller
     {
+        ApplicationDbContext db;
+        public HomeController()
+        {
+            db = new ApplicationDbContext();
+        }
         public ActionResult Index()
         {
             if (User.IsInRole("Member"))

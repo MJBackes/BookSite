@@ -107,7 +107,7 @@ namespace BookSite.Controllers.SiteControllers
                 discussionFromDb.StartTime = Start;
                 discussionFromDb.Date = Start.Date;
                 db.SaveChanges();
-                return RedirectToAction("Index", "Club", discussion.ClubId);
+                return RedirectToAction("Index", "Club", new { id = discussion.ClubId });
             }
             catch
             {
@@ -137,10 +137,10 @@ namespace BookSite.Controllers.SiteControllers
             }
         }
         [HttpGet]
-        public ActionResult GoLive(Guid id)
+        public async Task<ActionResult> GoLive(Guid id)
         {
             Discussion discussion = db.Discussions.Find(id);
-            //NotifyMembers(discussion);
+            await NotifyMembers(discussion);
             discussion.HasStarted = true;
             db.SaveChanges();
             return RedirectToAction("View", new { id = id });
@@ -172,12 +172,13 @@ namespace BookSite.Controllers.SiteControllers
         }
         private EmailModel BuildEmailModel(Member member, Discussion discussion)
         {
-            string BaseURL = "";
+            string BaseURL = "BookSite";
             string MemberEmail = db.Users.Find(member.ApplicationUserId).Email;
             string URL = $"{BaseURL}/Discussion/View/{discussion.Id}";
             return new EmailModel
             {
                 FromDisplayName = "BookSite",
+                FromEmailAddress = EmailInfo.EmailInfo.Address,
                 ToName = member.FirstName,
                 ToEmailAddress = MemberEmail,
                 Subject = $"The Book Discussion {discussion.Name} has just started!",

@@ -71,7 +71,7 @@
                     <img src="@Model.RelatedBooks[i].Thumbnail" alt="@Model.RelatedBooks[i].Title">
                     <div class="carousel-caption">
                         <h4 style="color: black">@Model.RelatedBooks[i].Title</h4>
-                        @Html.ActionLink("Link", "Details", "Book", new { id = Model.RelatedBooks[i].Id }, null)
+                        @Html.ActionLink("Link", "Details", "Book", new { id = Model.RelatedBooks[i].GoogleVolumeId }, null)
                     </div>
                 </div>
             }
