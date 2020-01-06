@@ -16,7 +16,7 @@ namespace BookSite.APIHandlers
     {
         public static GoogleBooksSearchResponse NavBarSearch(string input)
         {
-            string URI = $"https://www.googleapis.com/books/v1/volumes?q={input}&key={APIKeys.APIKey.GoogleBooks}";
+            string URI = $"https://www.googleapis.com/books/v1/volumes?printType=books&langRestrict=en&maxResults=40&q={input}&key={APIKeys.APIKey.GoogleBooks}";
             return VolumeSearch(URI).Result;
         }
         public static GoogleBooksSearchResponse FullSearch(Search input)
