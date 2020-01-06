@@ -23,7 +23,7 @@ namespace BookSite.APIHandlers
         {
             if (input == null)
                 return default;
-            StringBuilder URI = new StringBuilder($"https://www.googleapis.com/books/v1/volumes?q=");
+            StringBuilder URI = new StringBuilder($"https://www.googleapis.com/books/v1/volumes?printType=books&langRestrict=en&maxResults=40&q=");
             if (input.other != null)
                 URI.Append(input.other);
             if (input.intitle != null)

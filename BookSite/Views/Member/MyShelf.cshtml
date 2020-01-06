@@ -26,31 +26,44 @@
         <th class="col-md-1"></th>
     </tr>
 
-@foreach (var item in Model) {
-<tr>
-    <td>
-        <img src="@item.Thumbnail" />
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.Title)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.Authors)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.Categories)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.Description)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.PageCount)
-    </td>
-    <td>
-        @Html.ActionLink("Details", "Details","Book", new { id = item.GoogleVolumeId },new { @class="btn btn-primary", style="width:100%"})
-        @Html.ActionLink("Remove", "RemoveBookFromCollection","Member", new { id = item.GoogleVolumeId }, new { @class="btn btn-danger", style="width:100%"})
-    </td>
-</tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                <img src="@item.Thumbnail" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Authors)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Categories)
+            </td>
+            <td>
+                <div class="descriptionDiv">
+                    @Html.DisplayFor(modelItem => item.Description)
+                </div>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PageCount)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "Details", "Book", new { id = item.GoogleVolumeId }, new { @class = "btn btn-primary", style = "width:100%" })
+                @Html.ActionLink("Remove", "RemoveBookFromCollection", "Member", new { id = item.GoogleVolumeId }, new { @class = "btn btn-danger", style = "width:100%" })
+            </td>
+        </tr>
+    }
 
 </table>
+@Html.ActionLink("Search For A Book", "Search", "Book", null, new { @class = "btn btn-primary" })
+@section  scripts{
+    <script type="text/javascript" src="~/Scripts/clamp.js"></script>
+    <script>
+        let descriptions = document.getElementsByClassName("descriptionDiv");
+        for (let i = 0; i < descriptions.length; i++) {
+            $clamp(descriptions[i], { clamp: 12 });
+        }
+    </script>
+}

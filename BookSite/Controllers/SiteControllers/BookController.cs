@@ -52,6 +52,11 @@ namespace BookSite.Controllers.SiteControllers
             return View(ParseSearchResponse(response));
         }
         [HttpGet]
+        public ActionResult AuthorSearch(string InAuthor)
+        {
+            return RedirectToAction("SearchResults", new Search { inauthor = InAuthor });
+        }
+        [HttpGet]
         public ActionResult Search()
         {
             return View();
@@ -138,12 +143,15 @@ namespace BookSite.Controllers.SiteControllers
         }
         private void AddBookAuthorJunctionEntries(Book book, string[] authors)
         {
-            foreach(string s in authors)
+            if (authors != null)
             {
-                Author author = db.Authors.FirstOrDefault(a => a.Name == s);
-                db.BookAuthors.Add(new BookAuthors { Id = Guid.NewGuid(), Author = author, Book = book });
+                foreach (string s in authors)
+                {
+                    Author author = db.Authors.FirstOrDefault(a => a.Name == s);
+                    db.BookAuthors.Add(new BookAuthors { Id = Guid.NewGuid(), Author = author, Book = book });
+                }
+                db.SaveChanges();
             }
-            db.SaveChanges();
         }
         private void AddBookTagJunctionEntries(Book book, string[] categories)
         {

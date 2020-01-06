@@ -3,13 +3,8 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
-@Html.ActionLink("Search For A Book", "Search", "Book", null, new { @class = "btn btn-primary" })
-@Html.ActionLink("Search For A Book Club", "Search", "Club", null, new { @class = "btn btn-primary" })
-@Html.ActionLink("Search For A Member", "Search", "Member", null, new { @class = "btn btn-primary" })
-@Html.ActionLink("MyShelf", "MyShelf", "Member", null, new { @class = "btn btn-success" })
-@Html.ActionLink("Create a Book Club", "Create", "Club", null, new { @class = "btn btn-success" })
-@if (Model != null && Model.Clubs != null)
+<h2>Home</h2>
+@if (Model != null && Model.Clubs != null && Model.Clubs.Count > 0)
 {
     <table class="table-striped" width="100%">
         <tr>
@@ -27,7 +22,7 @@
         {
             <tr>
                 <td>
-                    @club.Name
+                    @Html.ActionLink(club.Name, "Index", "Club", new { id = club.Id }, null)
                 </td>
                 <td>
                     @if (club.NextBook != null)
@@ -40,12 +35,13 @@
                     }
                 </td>
                 <td style="text-align:center">
-                    @Html.ActionLink("Home Page", "Index", "Club", new { id = club.Id }, new { @class = "btn btn-primary" })
                 </td>
             </tr>
         }
     </table>
-
+}
+@if (Model.Friends != null && Model.Friends.Count > 0)
+{
     <h3>Friends</h3>
     <table class="table-striped" width="100%">
         <tr>
@@ -73,17 +69,20 @@
             </tr>
         }
     </table>
-    if (Model.Recommendations.Count > 0)
+    }
+
+    @if (Model.Recommendations.Count > 0)
     {
         <h3>Recommendations based on the books on your shelf:</h3>
         <div id="recommendCarousel" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner" style="height: 200px">
                 @for (int i = 0; (i < Model.Recommendations.Count && i < 5); i++)
                 {
-                    <div class="item @if (i == 0) {@Html.Raw("active")}">
+                    <div style="background-color:#666666"class="item @if (i == 0) {@Html.Raw("active")}">
                         <img src="@Model.Recommendations[i].Thumbnail" alt="@Model.Recommendations[i].Title">
                         <div class="carousel-caption">
                             <h4 style="color: black">@Model.Recommendations[i].Title</h4>
+                            <h5 style="color:black">@Model.Recommendations[i].Authors</h5>
                             @Html.ActionLink("Link", "Details", "Book", new { id = Model.Recommendations[i].GoogleVolumeId }, null)
                         </div>
                     </div>
@@ -100,17 +99,19 @@
 
         </div>
     }
-    if (Model.AuthorBooks.Count > 0)
+
+    @if (Model.AuthorBooks.Count > 0)
     {
         <h3>More by authors you know:</h3>
         <div id="authorCarousel" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner" style="height: 200px">
                 @for (int i = 0; (i < Model.AuthorBooks.Count && i < 5); i++)
                 {
-                    <div class="item @if (i == 0) {@Html.Raw("active")}">
+                    <div style="text-align:center; background-color:#666666"class="item @if (i == 0) {@Html.Raw("active")}">
                         <img src="@Model.AuthorBooks[i].Thumbnail" alt="@Model.AuthorBooks[i].Title">
                         <div class="carousel-caption">
                             <h4 style="color: black">@Model.AuthorBooks[i].Title</h4>
+                            <h5 style="color:black">@Model.AuthorBooks[i].Authors</h5>
                             @Html.ActionLink("Link", "Details", "Book", new { id = Model.AuthorBooks[i].GoogleVolumeId }, null)
                         </div>
                     </div>
@@ -127,7 +128,8 @@
 
         </div>
     }
-    if (Model.FriendsBooks.Count > 0)
+
+    @if (Model.FriendsBooks.Count > 0)
     {
         <h3>Recomendations based on your friends shelves:</h3>
         <div id="friendCarousel" class="carousel slide" data-ride="carousel">
@@ -154,4 +156,4 @@
 
         </div>
     }
-}
+

@@ -45,7 +45,7 @@ namespace BookSite.Controllers.SiteControllers
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
             if (id == member.Id)
                 return RedirectToAction("Index");
-            MemberDetailsViewModel viewModel = BuildMemberDetailsViewModel(id);
+            MemberDetailsViewModel viewModel = BuildMemberDetailsViewModel(id, member);
             return View(viewModel);
         }
 
@@ -278,12 +278,15 @@ namespace BookSite.Controllers.SiteControllers
         {
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
             Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == member.Id);
-            List<CollectionBooks> collectionBooks = db.CollectionBooks.Where(cb => cb.CollectionId == collection.Id).ToList();
             List<Book> books = new List<Book>();
-            foreach (CollectionBooks cb in collectionBooks)
+            if (collection != null)
             {
-                Book book = db.Books.Find(cb.BookId);
-                books.Add(GetBookWithAuthorAndCategory(book));
+                books = db.CollectionBooks.Include("Book")
+                                          .Where(cb => cb.CollectionId == collection.Id)
+                                          .Select(cb => cb.Book)
+                                          .ToList();
+                foreach (Book book in books)
+                    book.Authors = GetAuthorStringForBook(book);
             }
             return books;
         }
@@ -341,7 +344,7 @@ namespace BookSite.Controllers.SiteControllers
             return book;
         }
 
-        private MemberDetailsViewModel BuildMemberDetailsViewModel(Guid id)
+        private MemberDetailsViewModel BuildMemberDetailsViewModel(Guid id, Member user)
         {
             Member member = db.Members.Find(id);
             List<Book> books = db.CollectionBooks.Include("Collection").Where(cb => cb.Collection.MemberId == member.Id).Select(cb => cb.Book).ToList();
@@ -352,8 +355,7 @@ namespace BookSite.Controllers.SiteControllers
                 Books = books,
                 Reviews = reviews
             };
-            FriendList friendList = db.FriendLists.FirstOrDefault(l => l.Id == member.Id);
-            if (friendList != null && db.FriendPairs.FirstOrDefault(p => p.ListId == friendList.Id && p.FriendId == id) != null)
+            if (db.FriendPairs.FirstOrDefault(p => p.ListId == user.Id && p.FriendId == id) != null)
                 viewModel.isFriend = true;
             return viewModel;
         }
@@ -388,14 +390,25 @@ namespace BookSite.Controllers.SiteControllers
             while(output.Count < 5 && index < books.Count)
             {
                 if (MyBooks.FirstOrDefault(b => b.GoogleVolumeId == books[index].GoogleVolumeId) == null)
+                {
+                    books[index].Authors = GetAuthorStringForBook(books[index]);
                     output.Add(books[index]);
+                }
                 index++;
             }
             return output;
         }
+        private string GetAuthorStringForBook(Book book)
+        {
+            List<Author> authors = db.BookAuthors.Include("Author").Where(ba => ba.BookId == book.Id).Select(ba => ba.Author).ToList();
+            return GetAuthorString(authors.ToArray());
+        }
         private List<Book> GetRecommendations(Member member)
         {
-            return GetRelatedRecommendations(GetShelfBooks(member)).Take(5).ToList();
+            List<Book> recommendations = GetRelatedRecommendations(GetShelfBooks(member)).Take(5).ToList();
+            foreach (Book book in recommendations)
+                book.Authors = GetAuthorStringForBook(book);
+            return recommendations;
         }
         private List<Book> GetAuthorBooks(Member member)
         {
@@ -439,7 +452,7 @@ namespace BookSite.Controllers.SiteControllers
               .Select(g => g.Value)
               .ToList();
             foreach (Book book in MyBooks)
-                AuthorBooks.Remove(book);
+                AuthorBooks.RemoveAll(b => b.GoogleVolumeId == book.GoogleVolumeId);
             return AuthorBooks;
         }
         private List<Book> GetShelfBooks(Member member)

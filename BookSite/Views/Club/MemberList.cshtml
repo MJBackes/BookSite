@@ -1,0 +1,30 @@
+﻿@model BookSite.Models.ViewModels.ClubIndexViewModel
+@{
+    ViewBag.Title = "MemberList";
+}
+
+<h2>@Model.Club.Name</h2>
+
+<table class="table-striped">
+    <tr>
+        <th>
+            Manager Name
+        </th>
+    </tr>
+    <tr>
+        <td>
+            @Html.ActionLink(Model.Members.First(m => m.IsManager).DisplayName, "Details", "Member", new { id = Model.Members.First(m => m.IsManager).Id }, null)
+        </td>
+    </tr>
+    @foreach (BookSite.Models.SiteModels.Member member in Model.Members)
+    {
+        if (!member.IsManager)
+        {
+        <tr>
+            <td>
+                @Html.ActionLink(member.DisplayName, "Details", "Member", new { id = member.Id }, null)
+            </td>
+        </tr>
+        }
+    }
+</table>

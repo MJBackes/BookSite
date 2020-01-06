@@ -317,6 +317,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="libman.json" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\clamp.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
@@ -395,6 +396,8 @@
     <Content Include="Views\Member\SearchResults.cshtml" />
     <Content Include="Views\Discussion\View.cshtml" />
     <Content Include="Views\Discussion\Edit.cshtml" />
+    <Content Include="Views\Club\MemberList.cshtml" />
+    <Content Include="Views\Shared\_LayoutMember.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

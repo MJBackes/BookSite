@@ -92,7 +92,7 @@ namespace BookSite.Controllers.SiteControllers
                 db.ClubMembers.Add(new ClubMembers { Id = Guid.NewGuid(), Club = club, Member = member });
                 db.SaveChanges();
             }
-            return RedirectToAction("Details", club);
+            return RedirectToAction("Index", new { id = club.Id });
         }
 
         // GET: Club/Edit/5
@@ -214,7 +214,13 @@ namespace BookSite.Controllers.SiteControllers
             viewModel.Reviews = db.Reviews.Include("Member").Where(r => r.BookId == viewModel.Book.Id).ToList();
             return View(viewModel);
         }
-
+        [HttpGet]
+        public ActionResult MemberList(Guid id)
+        {
+            ClubIndexViewModel viewModel = new ClubIndexViewModel { Club = db.BookClubs.Find(id) };
+            AddMembersToClubIndexViewModel(viewModel);
+            return View(viewModel);
+        }
         //Private Methods
 
         private Book ParseSingleSearchResponse(GoogleBookSingleResponse response)
@@ -361,14 +367,12 @@ namespace BookSite.Controllers.SiteControllers
         private void AddMembersToClubIndexViewModel(ClubIndexViewModel viewModel)
         {
             var userId = User.Identity.GetUserId();
-            List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.ClubId == viewModel.Club.Id).ToList();
-            Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
-            foreach (ClubMembers cm in clubMembers)
-            {
-                viewModel.Members.Add(db.Members.Find(cm.MemberId));
-                if (cm.MemberId == member.Id && cm.IsManager)
-                    viewModel.IsManager = true;
-            }
+            viewModel.Members = db.ClubMembers.Include("Member").Where(cm => cm.ClubId == viewModel.Club.Id).Select(cm => cm.Member).ToList();
+            Member user = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
+            Member manager = db.ClubMembers.Include("Member").FirstOrDefault(cm => cm.IsManager).Member;
+            viewModel.Members.First(m => m.Id == manager.Id).IsManager = true;
+            if (user.Id == manager.Id)
+                viewModel.IsManager = true;
         }
 
         private void AddDiscussionsToClubIndexViewModel(ClubIndexViewModel viewModel)

@@ -1,8 +1,38 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    background-color:#666633;
 }
-
+a {
+    color:aliceblue;
+}
+label{
+    color:aliceblue;
+}
+h2,h3,h4,h5{
+    color:aliceblue;
+}
+.navbar-inverse{
+    background-color:#264d00;
+}
+    .navbar-inverse .navbar-brand {
+        color: aliceblue;
+    }
+.nav-link{
+    color:aliceblue;
+}
+.navbar-inverse .navbar-nav > li > a {
+    color: aliceblue;
+}
+td, th{
+    color:aliceblue;
+}
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+    background-color: #264d00;
+}
+dt, dd{
+    color:aliceblue;
+}
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
@@ -21,7 +51,9 @@ input,
 select {
     max-width: 280px;
 }
-footer{
-    position:relative;
-    bottom:10px;
+footer {
+    position: relative;
+    bottom: 0px;
+    color:aliceblue;
+    
 }

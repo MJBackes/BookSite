@@ -20,34 +20,38 @@
     </dl>
     @if (!Model.isFriend)
     {
-    @Html.ActionLink("Add as Friend", "AddFriend", "Member", new { id = Model.Member.Id }, new { @class = "btn btn-success" })
+        @Html.ActionLink("Add as Friend", "AddFriend", "Member", new { id = Model.Member.Id }, new { @class = "btn btn-success" })
+    }
+    else
+    {
+        @Html.ActionLink("Remove Friend", "RemoveFriend", "Member", new { id = Model.Member.Id }, new { @class = "btn btn-danger" })
     }
     <h3>Shelf</h3>
     @if (Model.Books.Count > 0)
     {
-<div id="shelfCarousel" class="carousel slide" data-ride="carousel">
-    <div class="carousel-inner" style="height: 200px">
-        @for (int i = 0; i < Model.Books.Count; i++)
-        {
-            <div class="item @if (i == 0) {@Html.Raw("active")}">
-                <img src="@Model.Books[i].Thumbnail" alt="@Model.Books[i].Title">
-                <div class="carousel-caption">
-                    <h4 style="color: black">@Model.Books[i].Title</h4>
-                    @Html.ActionLink("Link", "Details", "Book", new { id = Model.Books[i].Id }, null)
-                </div>
+        <div id="shelfCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" style="height: 200px">
+                @for (int i = 0; i < Model.Books.Count; i++)
+                {
+                    <div class="item @if (i == 0) {@Html.Raw("active")}">
+                        <img src="@Model.Books[i].Thumbnail" alt="@Model.Books[i].Title">
+                        <div class="carousel-caption">
+                            <h4 style="color: black">@Model.Books[i].Title</h4>
+                            @Html.ActionLink("Link", "Details", "Book", new { id = Model.Books[i].Id }, null)
+                        </div>
+                    </div>
+                }
             </div>
-        }
-    </div>
-    <a class="left carousel-control" href="#shelfCarousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-    </a>
-    <a class="right carousel-control" href="#shelfCarousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-    </a>
+            <a class="left carousel-control" href="#shelfCarousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#shelfCarousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
 
-</div>
+        </div>
     }
     else
     {
@@ -59,23 +63,20 @@
         <div class="container">
             @for (int i = 0; i < Model.Reviews.Count; i++)
             {
-                    <div class="row">
-                        <div class="card col-md-4">
-                            <img class="card-img-top" src="@Model.Reviews[i].Book.Thumbnail" alt="Card image" style="width:50%">
-                            <div class="card-body">
-                                <h4 class="card-title">@Model.Reviews[i].Title</h4>
-                                <p class="card-text">@Model.Reviews[i].Body</p>
-                                @Html.ActionLink("To Book", "Details", "Book", new { id = Model.Reviews[i].Book.Id }, new { @class = "btn btn-primary"})
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-
+                <div class="row">
+                    <div class="card col-md-4">
+                        <img class="card-img-top" src="@Model.Reviews[i].Book.Thumbnail" alt="Card image" style="width:50%">
+                        <div class="card-body">
+                            <h4 class="card-title">@Model.Reviews[i].Title</h4>
+                            <p class="card-text">@Model.Reviews[i].Body</p>
+                            @Html.ActionLink("To Book", "Details", "Book", new { id = Model.Reviews[i].Book.Id }, new { @class = "btn btn-primary" })
                         </div>
                     </div>
+                    <div class="col-md-8">
+
+                    </div>
+                </div>
             }
         </div>
     }
 </div>
-<p>
-    @Html.ActionLink("Home", "Index")
-</p>

@@ -17,11 +17,23 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("BookSite", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("MyShelf", "MyShelf", "Member")</li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            Search for...
+                            <span class="caret"></span>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("A Book", "Search", "Book")</li>
+                                <li>@Html.ActionLink("A BookClub", "Search", "Club")</li>
+                                <li>@Html.ActionLink("A Member", "Search", "Member")</li>
+                            </ul>
+                        </a>
+                    </li>
+                    <li>@Html.ActionLink("Start a BookClub", "Create", "Club")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

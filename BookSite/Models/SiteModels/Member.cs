@@ -25,5 +25,7 @@ namespace BookSite.Models.SiteModels
         public ApplicationUser ApplicationUser { get; set; }
         [NotMapped]
         public bool NameIsTaken { get; set; }
+        [NotMapped]
+        public bool IsManager { get; set; }
     }
 }

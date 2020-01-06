@@ -4,9 +4,9 @@
 }
 
 <h2>@Model.Club.Name</h2>
-@Html.ActionLink("Choose Next Book", "NewBookSearch", "Club", new { clubId = Model.Club.Id }, new { @class = "btn btn-primary" })
 @if (Model.IsManager)
 {
+    @Html.ActionLink("Choose Next Book", "NewBookSearch", "Club", new { clubId = Model.Club.Id }, new { @class = "btn btn-primary" })
     @Html.ActionLink("Edit Club", "Edit", "Club", new { id = Model.Club.Id }, null)
 }
 <h3>Members</h3>
@@ -18,11 +18,19 @@
         <th class="col-md-8">
         </th>
     </tr>
-    @foreach (BookSite.Models.SiteModels.Member member in Model.Members)
+    @for (int i = 0; i < 8 && i < Model.Members.Count; i++)
     {
         <tr>
             <td>
-                @Html.ActionLink(member.DisplayName, "Details", "Member", new { id = member.Id }, null)
+                @Html.ActionLink(Model.Members[i].DisplayName, "Details", "Member", new { id = Model.Members[i].Id }, null)
+            </td>
+        </tr>
+    }
+    @if (Model.Members.Count > 8)
+    {
+        <tr>
+            <td>
+                @Html.ActionLink("Full Member List", "MemberList", "Club", new { id = Model.Club.Id }, null)
             </td>
         </tr>
     }
@@ -76,7 +84,7 @@
                 <td>
                     @if (Model.IsManager && !discussion.HasStarted)
                     {
-                        @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.Id } , null)
+                        @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.Id }, null)
                     }
                 </td>
                 <td>
@@ -84,9 +92,9 @@
                     {
                         @Html.ActionLink("Start", "GoLive", "Discussion", new { id = discussion.Id }, new { @class = "btn btn-success" })
                     }
-                    else if(discussion.HasStarted && !discussion.HasEnded && Model.IsManager)
+                    else if (discussion.HasStarted && !discussion.HasEnded && Model.IsManager)
                     {
-                        @Html.ActionLink("End", "Close", "Discussion", new { id = discussion.Id}, new { @class = "btn btn-danger"})
+                        @Html.ActionLink("End", "Close", "Discussion", new { id = discussion.Id }, new { @class = "btn btn-danger" })
                     }
                 </td>
             </tr>
