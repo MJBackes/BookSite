@@ -34,16 +34,16 @@ namespace BookSite.Controllers.SiteControllers
             return View(viewModel);
         }
 
-        [HttpGet]
-        public ActionResult NavBarSearch()
-        {
-            return View();
-        }
         [HttpPost]
-        public ActionResult NavBarSearch(string input)
+        public ActionResult NavBarSearch(NavBarSearchViewModel viewModel)
+        {
+            return RedirectToAction("NavBarSearchResults",new { input = viewModel.Search});
+        }
+        [HttpGet]
+        public ActionResult NavBarSearchResults(string input)
         {
             GoogleBooksSearchResponse response = GoogleBooksAPIHandler.NavBarSearch(input);
-            return View(ParseSearchResponse(response));
+            return View("NavBarSearchResults",ParseSearchResponse(response));
         }
         [HttpGet]
         public ActionResult SearchResults(Search search)

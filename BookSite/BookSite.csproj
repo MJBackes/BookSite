@@ -278,6 +278,7 @@
     <Compile Include="Models\ViewModels\ClubIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\MemberDetailsViewModel.cs" />
     <Compile Include="Models\ViewModels\MemberIndexViewModel.cs" />
+    <Compile Include="Models\ViewModels\NavBarSearchViewModel.cs" />
     <Compile Include="Models\ViewModels\NewBookSearchViewModel.cs" />
     <Compile Include="Models\ViewModels\NewBookViewModel.cs" />
     <Compile Include="Models\MiscModels\Search.cs" />
@@ -341,8 +342,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
     <Content Include="Views\Account\ConfirmEmail.cshtml" />
@@ -366,7 +365,7 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Member\Create.cshtml" />
     <Content Include="Views\Member\Index.cshtml" />
-    <Content Include="Views\Book\NavBarSearch.cshtml" />
+    <Content Include="Views\Book\NavBarSearchResults.cshtml" />
     <Content Include="Views\Book\SearchResults.cshtml" />
     <Content Include="Views\Book\Details.cshtml" />
     <Content Include="Views\Review\Create.cshtml" />
@@ -398,6 +397,7 @@
     <Content Include="Views\Discussion\Edit.cshtml" />
     <Content Include="Views\Club\MemberList.cshtml" />
     <Content Include="Views\Shared\_LayoutMember.cshtml" />
+    <Content Include="Views\Shared\NavBarSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

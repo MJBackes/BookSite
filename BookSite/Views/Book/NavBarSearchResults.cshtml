@@ -1,0 +1,78 @@
+﻿@model List<BookSite.Models.SiteModels.Book>
+
+@{
+    ViewBag.Title = "Search Results";
+}
+
+<h2>Search Results</h2>
+
+<table class="table-striped">
+    <tr>
+        <th class="col-md-2"></th>
+        <th class="col-md-2">
+            Title
+        </th>
+        <th class="col-md-2">
+            Authors
+        </th>
+        <th class="col-md-2">
+            Categories
+        </th>
+        <th class="col-md-3">
+            Description
+        </th>
+        <th class="col-md-1">
+            Page Count
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        if (item.Thumbnail != null || item.Description != null)
+        {
+            <tr style="margin-bottom:10px">
+                <td>
+                    <img src="@item.Thumbnail" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @if (item.Authors != null && item.Authors.Length > 0)
+                    {
+                        @Html.ActionLink(item.Authors, "AuthorSearch", new { InAuthor = item.Authors })
+                    }
+                    else
+                    {
+                        @Html.Raw("Unknown")
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Categories)
+                </td>
+                <td>
+                    <div class="descriptionDiv">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PageCount)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = item.GoogleVolumeId })
+                </td>
+            </tr>
+        }
+    }
+
+</table>
+@section scripts{
+    <script type="text/javascript" src="~/Scripts/clamp.js"></script>
+    <script>
+    let description = document.getElementsByClassName("descriptionDiv");
+    for (let i = 0; i < description.length; i++) {
+        $clamp(description[i], { clamp: 10 });
+    }
+    </script>
+}

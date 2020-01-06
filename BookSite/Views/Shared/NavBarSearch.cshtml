@@ -1,0 +1,21 @@
+﻿@model BookSite.Models.ViewModels.NavBarSearchViewModel
+
+@using (Html.BeginForm("NavBarSearch","Book", null, FormMethod.Post, new { @class = "navbar-form navbar-right", role = "search" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-inline" style="display:inline">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            <div>
+                @Html.EditorFor(model => model.Search, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Search, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div>
+                <input type="submit" value="Search" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+ }
