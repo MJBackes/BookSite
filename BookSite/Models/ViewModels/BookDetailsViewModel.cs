@@ -1,4 +1,5 @@
-﻿using BookSite.Models.SiteModels;
+﻿using BookSite.Interfaces;
+using BookSite.Models.SiteModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Web;
 
 namespace BookSite.Models.ViewModels
 {
-    public class BookDetailsViewModel
+    public class BookDetailsViewModel : IViewModel
     {
         public Book Book { get; set; }
         public List<Book> RelatedBooks { get; set; }

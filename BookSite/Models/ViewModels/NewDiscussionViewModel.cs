@@ -1,4 +1,5 @@
-﻿using BookSite.Models.SiteModels;
+﻿using BookSite.Interfaces;
+using BookSite.Models.SiteModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ using System.Web;
 
 namespace BookSite.Models.ViewModels
 {
-    public class NewDiscussionViewModel
+    public class NewDiscussionViewModel : IViewModel
     {
         public string Name { get; set; }
         [DataType(DataType.Date)]

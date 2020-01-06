@@ -1,4 +1,5 @@
 ﻿using BookSite.APIHandlers;
+using BookSite.Factories;
 using BookSite.Models;
 using BookSite.Models.MiscModels;
 using BookSite.Models.SiteModels;
@@ -99,28 +100,6 @@ namespace BookSite.Controllers.SiteControllers
                 return View();
             }
         }
-
-        // GET: Member/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: Member/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
         [HttpGet]
         public ActionResult AddBookToCollection(string id)
         {
@@ -136,12 +115,12 @@ namespace BookSite.Controllers.SiteControllers
             Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == member.Id);
             if (collection == null)
             {
-                db.Collections.Add(new Collection { Id = Guid.NewGuid(), MemberId = member.Id });
+                db.Collections.Add(ModelFactory.NewCollection(member));
                 db.SaveChanges();
                 collection = db.Collections.FirstOrDefault(c => c.MemberId == member.Id);
             }
             Book bookFromDb = db.Books.FirstOrDefault(b => b.GoogleVolumeId == book.GoogleVolumeId);
-            db.CollectionBooks.Add(new CollectionBooks { Id = Guid.NewGuid(), Book = bookFromDb, Collection = collection });
+            db.CollectionBooks.Add(ModelFactory.NewCollectionBooks(collection,bookFromDb));
             db.SaveChanges();
             return RedirectToAction("Index");
         }
@@ -421,12 +400,7 @@ namespace BookSite.Controllers.SiteControllers
         private List<Book> GetAuthorBooks(Member member)
         {
             List<Book> books = GetShelfBooks(member);
-            return GetBooksByAuthor(GetMostCommonAuthors(books)).Take(5).ToList();
-        }
-        private List<Book> GetSubjectBooks(Member member)
-        {
-            List<Book> books = GetShelfBooks(member);
-            return GetBooksBySubject(GetMostCommonSubjects(books)).Take(5).ToList();
+            return GetBooksByAuthor(GetMostCommonAuthors(books), books).Take(5).ToList();
         }
         private List<Book> GetRelatedRecommendations(List<Book> shelfBooks)
         {
@@ -449,30 +423,14 @@ namespace BookSite.Controllers.SiteControllers
             }
             return recomendations;
         }
-        private List<Book> GetBooksBySubject(List<string> subjects)
-        {
-            List<Book> SubjectBooks = new List<Book>();
-            foreach(string subject in subjects)
-            {
-                SubjectBooks = SubjectBooks.Concat(Utilities.GoogleBookSearchUtilities.ParseSearchResponse(GoogleBooksAPIHandler.FullSearch(new Search {subject = subject }))).ToList();
-            }
-            return SubjectBooks.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
-            {
-                Key = googleId,
-                Count = Books.Count(),
-                Value = Books.First()
-            }).OrderByDescending(g => g.Count)
-              .Select(g => g.Value)
-              .ToList();
-        }
-        private List<Book> GetBooksByAuthor(List<Author> authors)
+        private List<Book> GetBooksByAuthor(List<Author> authors, List<Book> MyBooks)
         {
             List<Book> AuthorBooks = new List<Book>();
             foreach(Author author in authors)
             {
                 AuthorBooks = AuthorBooks.Concat(Utilities.GoogleBookSearchUtilities.ParseSearchResponse(GoogleBooksAPIHandler.FullSearch(new Search { inauthor = author.Name }))).ToList();
             }
-            return AuthorBooks.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
+            AuthorBooks = AuthorBooks.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
             {
                 Key = googleId,
                 Count = Books.Count(),
@@ -480,6 +438,9 @@ namespace BookSite.Controllers.SiteControllers
             }).OrderByDescending(g => g.Count)
               .Select(g => g.Value)
               .ToList();
+            foreach (Book book in MyBooks)
+                AuthorBooks.Remove(book);
+            return AuthorBooks;
         }
         private List<Book> GetShelfBooks(Member member)
         {
@@ -487,27 +448,6 @@ namespace BookSite.Controllers.SiteControllers
                                      .Where(cb => cb.Collection.MemberId == member.Id)
                                      .Select(cb => cb.Book)
                                      .ToList();
-        }
-        private List<string> GetMostCommonSubjects(List<Book> books)
-        {
-            List<GenreTag> tags = new List<GenreTag>();
-            foreach(Book book in books)
-            {
-                tags = tags.Concat(db.BookTags.Include("GenreTag")
-                                              .Where(bt => bt.BookId == book.Id)
-                                              .Select(bt => bt.GenreTag))
-                                              .ToList();
-            }
-            var groupings = tags.GroupBy(t => t.Id, (id, Tags) => new
-            {
-                Key = id,
-                Count = Tags.Count(),
-                Value = Tags.First()
-            });
-            
-            return groupings.Where(g => g.Count == groupings.Max(gr => gr.Count))
-                            .Select(g => g.Value.Name)
-                            .ToList();
         }
         private List<Author> GetMostCommonAuthors(List<Book> books)
         {
@@ -574,7 +514,6 @@ namespace BookSite.Controllers.SiteControllers
             viewModel.FriendsBooks = GetFriendsBooks(viewModel.Friends, db.Collections.FirstOrDefault(c => c.MemberId == member.Id));
             viewModel.Recommendations = GetRecommendations(member);
             viewModel.AuthorBooks = GetAuthorBooks(member);
-            viewModel.SubjectBooks = GetSubjectBooks(member);
             return viewModel;
         }
     }
