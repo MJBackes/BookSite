@@ -201,7 +201,7 @@ namespace BookSite.Controllers.SiteControllers
         public ActionResult NewBookSearchResults(NewBookSearchViewModel input)
         {
             GoogleBooksSearchResponse response = GoogleBooksAPIHandler.FullSearch(new Models.MiscModels.Search { inauthor = input.InAuthor, intitle = input.InTitle, isbn = input.ISBN, other = input.Other, subject = input.Subject});
-            NewBookViewModel viewModel = new NewBookViewModel { Books = ParseSearchResponse(response), ClubId = input.ClubId};
+            NewBookViewModel viewModel = new NewBookViewModel { Books = Utilities.GoogleBookSearchUtilities.ParseSearchResponse(response), ClubId = input.ClubId};
             return View(viewModel);
         }
         [HttpGet]
@@ -210,7 +210,7 @@ namespace BookSite.Controllers.SiteControllers
             NewBookViewModel viewModel = new NewBookViewModel();
             viewModel.GoogleVolumeId = id;
             viewModel.ClubId = clubId;
-            viewModel.Book = ParseSingleSearchResponse(GoogleBooksAPIHandler.SingleSearch(viewModel.GoogleVolumeId).Result);
+            viewModel.Book = Utilities.GoogleBookSearchUtilities.ParseSingleSearchResponse(GoogleBooksAPIHandler.SingleSearch(viewModel.GoogleVolumeId).Result);
             viewModel.Reviews = db.Reviews.Include("Member").Where(r => r.BookId == viewModel.Book.Id).ToList();
             return View(viewModel);
         }
@@ -222,142 +222,6 @@ namespace BookSite.Controllers.SiteControllers
             return View(viewModel);
         }
         //Private Methods
-
-        private Book ParseSingleSearchResponse(GoogleBookSingleResponse response)
-        {
-            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == response.id);
-            if (book != null)
-            {
-                book.Authors = GetAuthorString(response.volumeInfo.authors);
-                book.Categories = GetCategoryString(response.volumeInfo.categories);
-                return book;
-            }
-            else
-            {
-                return AddNewSingleBook(response);
-            }
-        }
-        private Book AddNewSingleBook(GoogleBookSingleResponse response)
-        {
-            Book book = new Book()
-            {
-                Id = Guid.NewGuid(),
-                GoogleVolumeId = response.id,
-                Description = response.volumeInfo.description,
-                Title = response.volumeInfo.title,
-                PageCount = response.volumeInfo.pageCount,
-                Thumbnail = response.volumeInfo.imageLinks == null ? null : response.volumeInfo.imageLinks.thumbnail
-            };
-            book.Authors = GetAuthorString(response.volumeInfo.authors);
-            AddBookAuthorJunctionEntries(book, response.volumeInfo.authors);
-            book.Categories = GetCategoryString(response.volumeInfo.categories);
-            AddBookTagJunctionEntries(book, response.volumeInfo.categories);
-            db.Books.Add(book);
-            db.SaveChanges();
-            return book;
-        }
-        private List<Book> ParseSearchResponse(GoogleBooksSearchResponse response)
-        {
-            if (response == null || response.items == null)
-                return default;
-            List<Book> output = new List<Book>();
-            foreach (Item item in response.items)
-            {
-                output.Add(ParseSearchItem(item));
-            }
-            return output;
-        }
-        private Book ParseSearchItem(Item item)
-        {
-            Book book = db.Books.FirstOrDefault(b => b.GoogleVolumeId == item.id);
-            if (book != null)
-            {
-                book.Authors = GetAuthorString(item.volumeInfo.authors);
-                book.Categories = GetCategoryString(item.volumeInfo.categories);
-                return book;
-            }
-            else
-            {
-                return AddNewVolumeBook(item);
-            }
-        }
-        private Book AddNewVolumeBook(Item item)
-        {
-            Book book = new Book()
-            {
-                Id = Guid.NewGuid(),
-                GoogleVolumeId = item.id,
-                Description = item.volumeInfo.description,
-                Title = item.volumeInfo.title,
-                PageCount = item.volumeInfo.pageCount,
-                Thumbnail = item.volumeInfo.imageLinks == null ? null : item.volumeInfo.imageLinks.thumbnail
-            };
-            book.Authors = GetAuthorString(item.volumeInfo.authors);
-            AddBookAuthorJunctionEntries(book, item.volumeInfo.authors);
-            book.Categories = GetCategoryString(item.volumeInfo.categories);
-            AddBookTagJunctionEntries(book, item.volumeInfo.categories);
-            return book;
-        }
-        private void AddBookAuthorJunctionEntries(Book book, string[] authors)
-        {
-            if (authors != null)
-            {
-                foreach (string s in authors)
-                {
-                    Author author = db.Authors.FirstOrDefault(a => a.Name == s);
-                    db.BookAuthors.Add(new BookAuthors { Id = Guid.NewGuid(), Author = author, Book = book });
-                }
-                db.SaveChanges();
-            }
-        }
-        private void AddBookTagJunctionEntries(Book book, string[] categories)
-        {
-            if (categories != null)
-            {
-                foreach (string s in categories)
-                {
-                    GenreTag tag = db.GenreTags.FirstOrDefault(t => t.Name == s);
-                    db.BookTags.Add(new BookTags { Id = Guid.NewGuid(), BookId = book.Id, TagId = tag.Id });
-                }
-            }
-            db.SaveChanges();
-        }
-        private string GetCategoryString(string[] categories)
-        {
-            StringBuilder output = new StringBuilder("");
-            if (categories != null)
-                for (int i = 0; i < categories.Length; i++)
-                {
-                    string categoryName = categories[i];
-                    if (db.GenreTags.FirstOrDefault(g => g.Name == categoryName) == null)
-                    {
-                        db.GenreTags.Add(new GenreTag { Id = Guid.NewGuid(), Name = categoryName });
-                        db.SaveChanges();
-                    }
-                    output.Append(categories[i]);
-                    if (i != categories.Length - 1)
-                        output.Append(" , ");
-                }
-            return output.ToString();
-        }
-        private string GetAuthorString(string[] authors)
-        {
-            StringBuilder output = new StringBuilder("");
-            if (authors != null)
-                for (int i = 0; i < authors.Length; i++)
-                {
-                    string authorName = authors[i];
-                    if (db.Authors.FirstOrDefault(a => a.Name == authorName) == null)
-                    {
-                        db.Authors.Add(new Author { Name = authorName, Id = Guid.NewGuid() });
-                        db.SaveChanges();
-                    }
-                    output.Append(authors[i]);
-                    if (i != authors.Length - 1)
-                        output.Append(" , ");
-                }
-            return output.ToString();
-        }
         private ClubIndexViewModel GetClubIndexViewModel(BookClub club)
         {
             ClubIndexViewModel viewModel = new ClubIndexViewModel { Club = club, Discussions = new List<Discussion>(), Members = new List<Member>() };

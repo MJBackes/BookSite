@@ -172,7 +172,7 @@ namespace BookSite.Controllers.SiteControllers
         }
         private EmailModel BuildEmailModel(Member member, Discussion discussion)
         {
-            string BaseURL = "BookSite";
+            string BaseURL = "https://localhost:44344";
             string MemberEmail = db.Users.Find(member.ApplicationUserId).Email;
             string URL = $"{BaseURL}/Discussion/View/{discussion.Id}";
             return new EmailModel

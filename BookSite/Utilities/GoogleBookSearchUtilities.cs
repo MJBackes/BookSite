@@ -36,7 +36,7 @@ namespace BookSite.Utilities
                 Description = response.volumeInfo.description,
                 Title = response.volumeInfo.title,
                 PageCount = response.volumeInfo.pageCount,
-                Thumbnail = response.volumeInfo.imageLinks == null ? null : response.volumeInfo.imageLinks.thumbnail
+                Thumbnail = response.volumeInfo.imageLinks == null ? Constants.Placeholders.Thumbnail : response.volumeInfo.imageLinks.thumbnail
             };
             book.Authors = GetAuthorString(response.volumeInfo.authors);
             AddBookAuthorJunctionEntries(book, response.volumeInfo.authors);
@@ -78,7 +78,7 @@ namespace BookSite.Utilities
                 Description = item.volumeInfo.description,
                 Title = item.volumeInfo.title,
                 PageCount = item.volumeInfo.pageCount,
-                Thumbnail = item.volumeInfo.imageLinks == null ? null : item.volumeInfo.imageLinks.thumbnail
+                Thumbnail = item.volumeInfo.imageLinks == null ? Constants.Placeholders.Thumbnail : item.volumeInfo.imageLinks.thumbnail
             };
             book.Authors = GetAuthorString(item.volumeInfo.authors);
             AddBookAuthorJunctionEntries(book, item.volumeInfo.authors);
@@ -88,12 +88,15 @@ namespace BookSite.Utilities
         }
         public static void AddBookAuthorJunctionEntries(Book book, string[] authors)
         {
-            foreach (string s in authors)
+            if (authors != null)
             {
-                Author author = db.Authors.FirstOrDefault(a => a.Name == s);
-                db.BookAuthors.Add(new BookAuthors { Id = Guid.NewGuid(), Author = author, Book = book });
+                foreach (string s in authors)
+                {
+                    Author author = db.Authors.FirstOrDefault(a => a.Name == s);
+                    db.BookAuthors.Add(new BookAuthors { Id = Guid.NewGuid(), Author = author, Book = book });
+                }
+                db.SaveChanges();
             }
-            db.SaveChanges();
         }
         public static void AddBookTagJunctionEntries(Book book, string[] categories)
         {
@@ -104,8 +107,8 @@ namespace BookSite.Utilities
                     GenreTag tag = db.GenreTags.FirstOrDefault(t => t.Name == s);
                     db.BookTags.Add(new BookTags { Id = Guid.NewGuid(), BookId = book.Id, TagId = tag.Id });
                 }
+                db.SaveChanges();
             }
-            db.SaveChanges();
         }
         public static string GetCategoryString(string[] categories)
         {

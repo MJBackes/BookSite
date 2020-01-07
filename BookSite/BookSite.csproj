@@ -244,6 +244,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Constants\ArraysForRatingSelectLists.cs" />
+    <Compile Include="Constants\Placeholders.cs" />
     <Compile Include="Factories\ModelFactory.cs" />
     <Compile Include="Hubs\ChatHub.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -438,7 +439,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>50899</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44395/</IISUrl>
+          <IISUrl>https://localhost:44344/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
