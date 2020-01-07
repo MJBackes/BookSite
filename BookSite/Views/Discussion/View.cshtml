@@ -10,6 +10,15 @@
 
 <div class="container">
     <table class="table-striped" id="discussion" width="100%">
+        <tr>
+            <td class="col-md-3">
+
+            </td>
+            <td class="col-md-9">
+                <p>Welcome!</p>
+                <p>Type your comments in the box below and hit "Send" to participate.</p>
+            </td>
+        </tr>
         @if (Model.Comments != null && Model.Comments.Count > 0) {
             foreach (BookSite.Models.SiteModels.Comment comment in Model.Comments)
             {

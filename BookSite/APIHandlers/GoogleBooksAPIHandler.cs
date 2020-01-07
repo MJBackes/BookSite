@@ -25,15 +25,15 @@ namespace BookSite.APIHandlers
                 return default;
             StringBuilder URI = new StringBuilder($"https://www.googleapis.com/books/v1/volumes?printType=books&langRestrict=en&maxResults=40&q=");
             if (input.other != null)
-                URI.Append(input.other);
+                URI.Append(input.other + "+");
             if (input.intitle != null)
-                URI.Append($"+intitle:{input.intitle}");
+                URI.Append($"intitle:{input.intitle}+");
             if (input.inauthor != null)
-                URI.Append($"+inauthor:{input.inauthor}");
+                URI.Append($"inauthor:{input.inauthor}+");
             if (input.subject != null)
-                URI.Append($"+subject:{input.subject}");
+                URI.Append($"subject:{input.subject}+");
             if (input.isbn != null)
-                URI.Append($"+isbn:{input.isbn}");
+                URI.Append($"isbn:{input.isbn}+");
             URI.Append($"&key={APIKeys.APIKey.GoogleBooks}");
             return VolumeSearch(URI.ToString()).Result;
         }

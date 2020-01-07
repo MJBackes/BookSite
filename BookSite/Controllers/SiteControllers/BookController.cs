@@ -103,6 +103,8 @@ namespace BookSite.Controllers.SiteControllers
         }
         private List<Book> ParseSearchResponse(GoogleBooksSearchResponse response)
         {
+            if (response == null || response.items == null)
+                return default;
             List<Book> output = new List<Book>();
             foreach(Item item in response.items)
             {
@@ -219,7 +221,7 @@ namespace BookSite.Controllers.SiteControllers
             foreach(Collection c in collections)
             {
                 books = books.Concat(db.CollectionBooks.Include("Book")
-                                                       .Where(cb => cb.CollectionId == c.Id)
+                                                       .Where(cb => cb.CollectionId == c.Id && cb.Book.Thumbnail != null)
                                                        .Select(cb => cb.Book))
                                                        .ToList();
             }

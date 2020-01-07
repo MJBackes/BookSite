@@ -1,6 +1,7 @@
 ﻿using BookSite.APIHandlers;
 using BookSite.Factories;
 using BookSite.Models;
+using BookSite.Models.APIResponseModels;
 using BookSite.Models.MiscModels;
 using BookSite.Models.SiteModels;
 using BookSite.Models.ViewModels;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -375,7 +377,7 @@ namespace BookSite.Controllers.SiteControllers
             {
                 Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == friend.Id);
                 if(collection != null)
-                    books = books.Concat(db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == collection.Id).Select(cb => cb.Book)).ToList();
+                    books = books.Concat(db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == collection.Id && cb.Book.Thumbnail != null).Select(cb => cb.Book)).ToList();
             }
             books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
                 Key = googleId,
@@ -413,7 +415,15 @@ namespace BookSite.Controllers.SiteControllers
         private List<Book> GetAuthorBooks(Member member)
         {
             List<Book> books = GetShelfBooks(member);
-            return GetBooksByAuthor(GetMostCommonAuthors(books), books).Take(5).ToList();
+            List<List<Book>> booksByAuthor = GetBooksByAuthor(GetMostCommonAuthors(books));
+            List<Book> output = new List<Book>();
+            int index = 0;
+            while(index < 5 && index < booksByAuthor.Count)
+            {
+                output.Add(booksByAuthor[index].First());
+                index++;
+            }
+            return output;
         }
         private List<Book> GetRelatedRecommendations(List<Book> shelfBooks)
         {
@@ -436,23 +446,20 @@ namespace BookSite.Controllers.SiteControllers
             }
             return recomendations;
         }
-        private List<Book> GetBooksByAuthor(List<Author> authors, List<Book> MyBooks)
+        private List<List<Book>> GetBooksByAuthor(List<Author> authors)
         {
-            List<Book> AuthorBooks = new List<Book>();
-            foreach(Author author in authors)
+            List<List<Book>> AuthorBooks = new List<List<Book>>();
+            List<GoogleBooksSearchResponse> responses = new List<GoogleBooksSearchResponse>();
+            Parallel.ForEach(authors, (author) =>
             {
-                AuthorBooks = AuthorBooks.Concat(Utilities.GoogleBookSearchUtilities.ParseSearchResponse(GoogleBooksAPIHandler.FullSearch(new Search { inauthor = author.Name }))).ToList();
+                GoogleBooksSearchResponse response = GoogleBooksAPIHandler.FullSearch(new Search { inauthor = author.Name });
+                responses.Add(response);
+            });
+            foreach(GoogleBooksSearchResponse response in responses)
+            {
+                AuthorBooks.Add(Utilities.GoogleBookSearchUtilities.ParseSearchResponse(response).ToList());
             }
-            AuthorBooks = AuthorBooks.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
-            {
-                Key = googleId,
-                Count = Books.Count(),
-                Value = Books.First()
-            }).OrderByDescending(g => g.Count)
-              .Select(g => g.Value)
-              .ToList();
-            foreach (Book book in MyBooks)
-                AuthorBooks.RemoveAll(b => b.GoogleVolumeId == book.GoogleVolumeId);
+            AuthorBooks = AuthorBooks.OrderByDescending(l => l.Count).ToList();
             return AuthorBooks;
         }
         private List<Book> GetShelfBooks(Member member)
@@ -472,15 +479,12 @@ namespace BookSite.Controllers.SiteControllers
                                                        .Select(ba => ba.Author))
                                                        .ToList();
             }
-            var groupings = authors.GroupBy(a => a.Id, (id, Authors) => new
+            return authors.GroupBy(a => a.Id, (id, Authors) => new
             {
                 Key = id,
                 Count = Authors.Count(),
                 Value = Authors.First()
-            });
-            return groupings.Where(g => g.Count == groupings.Max(gr => gr.Count))
-                            .Select(g => g.Value)
-                            .ToList();
+            }).Select(g => g.Value).ToList();
         }
         private List<Book> GetRelatedBooks(Book book)
         {
@@ -492,7 +496,7 @@ namespace BookSite.Controllers.SiteControllers
             foreach (Collection c in collections)
             {
                 books = books.Concat(db.CollectionBooks.Include("Book")
-                                                       .Where(cb => cb.CollectionId == c.Id)
+                                                       .Where(cb => cb.CollectionId == c.Id && cb.Book.Thumbnail != null)
                                                        .Select(cb => cb.Book))
                                                        .ToList();
             }

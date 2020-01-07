@@ -26,44 +26,58 @@
         </th>
         <th></th>
     </tr>
-
-    @foreach (var item in Model)
+    @if (Model != null)
     {
-        if (item.Thumbnail != null || item.Description != null)
+        foreach (var item in Model)
         {
-        <tr style="margin-bottom:10px">
+            if (item.Thumbnail != null || item.Thumbnail.Length > 0 || item.Description != null)
+            {
+                <tr style="min-height:190px">
+                    <td>
+                        <img src="@item.Thumbnail" />
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @if (item.Authors != null && item.Authors.Length > 0)
+                        {
+                            @Html.ActionLink(item.Authors, "AuthorSearch", new { InAuthor = item.Authors })
+                        }
+                        else
+                        {
+                            @Html.Raw("Unknown")
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Categories)
+                    </td>
+                    <td>
+                        <div class="descriptionDiv">
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </div>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PageCount)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Details", "Details", new { id = item.GoogleVolumeId })
+                    </td>
+                </tr>
+            }
+        }
+    }
+    else
+    {
+        <tr>
+            <td></td>
+            <td></td>
             <td>
-                <img src="@item.Thumbnail" />
+                <h2>No results for that search.</h2>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @if (item.Authors != null && item.Authors.Length > 0)
-                {
-                @Html.ActionLink(item.Authors, "AuthorSearch", new { InAuthor = item.Authors })
-                }
-                else
-                {
-                    @Html.Raw("Unknown")
-                }
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Categories)
-            </td>
-            <td>
-                <div class="descriptionDiv">
-                    @Html.DisplayFor(modelItem => item.Description)
-                </div>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PageCount)
-            </td>
-            <td>
-                @Html.ActionLink("Details", "Details", new { id = item.GoogleVolumeId })
             </td>
         </tr>
-        }
     }
 
 </table>

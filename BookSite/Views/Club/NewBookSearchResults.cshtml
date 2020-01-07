@@ -29,7 +29,7 @@
     {
         foreach (var item in Model.Books)
         {
-            <tr>
+            <tr style="min-height:190px">
                 <td>
                     <img src="@item.Thumbnail" />
                 </td>
@@ -43,7 +43,9 @@
                     @Html.DisplayFor(modelItem => item.Categories)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Description)
+                    <div class="descriptionDiv">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </div>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PageCount)
@@ -56,3 +58,12 @@
     }
 
 </table>
+@section scripts{
+    <script type="text/javascript" src="~/Scripts/clamp.js"></script>
+    <script>
+    let description = document.getElementsByClassName("descriptionDiv");
+    for (let i = 0; i < description.length; i++) {
+        $clamp(description[i], { clamp: 10 });
+    }
+    </script>
+}

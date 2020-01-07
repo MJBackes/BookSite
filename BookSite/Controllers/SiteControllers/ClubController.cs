@@ -258,7 +258,7 @@ namespace BookSite.Controllers.SiteControllers
         }
         private List<Book> ParseSearchResponse(GoogleBooksSearchResponse response)
         {
-            if (response == null)
+            if (response == null || response.items == null)
                 return default;
             List<Book> output = new List<Book>();
             foreach (Item item in response.items)
@@ -300,12 +300,15 @@ namespace BookSite.Controllers.SiteControllers
         }
         private void AddBookAuthorJunctionEntries(Book book, string[] authors)
         {
-            foreach (string s in authors)
+            if (authors != null)
             {
-                Author author = db.Authors.FirstOrDefault(a => a.Name == s);
-                db.BookAuthors.Add(new BookAuthors { Id = Guid.NewGuid(), Author = author, Book = book });
+                foreach (string s in authors)
+                {
+                    Author author = db.Authors.FirstOrDefault(a => a.Name == s);
+                    db.BookAuthors.Add(new BookAuthors { Id = Guid.NewGuid(), Author = author, Book = book });
+                }
+                db.SaveChanges();
             }
-            db.SaveChanges();
         }
         private void AddBookTagJunctionEntries(Book book, string[] categories)
         {
@@ -388,16 +391,11 @@ namespace BookSite.Controllers.SiteControllers
         private void AddBooksToClubIndexViewModel(ClubIndexViewModel viewModel)
         {
             List<Book> books = GetBooksForClubIndexViewModel(viewModel.Members);
-            var sortedBooks = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
+            viewModel.Books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
                 Count = Books.Count(),
                 Key = googleId,
                 Value = Books.First()
-            }).OrderByDescending(g => g.Count);
-            viewModel.Books = new List<Book>();
-            for (int i = 0; i < sortedBooks.Count(); i++)
-            {
-                viewModel.Books.Add(sortedBooks.ElementAt(i).Value);
-            }
+            }).OrderByDescending(g => g.Count).Select(g => g.Value).ToList();
         }
 
         private List<Book> GetBooksForClubIndexViewModel(List<Member> members) 
@@ -408,9 +406,10 @@ namespace BookSite.Controllers.SiteControllers
                 Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == m.Id);
                 if (collection != null)
                 {
-                    List<CollectionBooks> collectionBooks = db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == collection.Id).ToList();
-                    foreach (CollectionBooks cb in collectionBooks)
-                        books.Add(cb.Book);
+                    books = books.Concat(db.CollectionBooks.Include("Book")
+                                                                   .Where(cb => cb.CollectionId == collection.Id && cb.Book.Thumbnail != null)
+                                                                   .Select(cb => cb.Book))
+                                                                   .ToList();
                 }
             }
             return books;
