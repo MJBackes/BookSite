@@ -420,7 +420,15 @@ namespace BookSite.Controllers.SiteControllers
             int index = 0;
             while(index < 5 && index < booksByAuthor.Count)
             {
-                output.Add(booksByAuthor[index].First());
+                int innerIndex = 0;
+                while (books.FirstOrDefault(b => b.Id == booksByAuthor[index][innerIndex].Id) != null || booksByAuthor[index][innerIndex].Thumbnail == null)
+                {
+                    innerIndex++;
+                    if (innerIndex > booksByAuthor[index].Count)
+                        break;
+                }
+                if(innerIndex < booksByAuthor[index].Count)
+                    output.Add(booksByAuthor[index][innerIndex]);
                 index++;
             }
             return output;

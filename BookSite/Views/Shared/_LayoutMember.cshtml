@@ -23,9 +23,10 @@
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Index", "Member")</li>
                     <li>@Html.ActionLink("MyShelf", "MyShelf", "Member")</li>
+                    <li>@Html.ActionLink("Start a BookClub", "Create", "Club")</li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown">
-                            Search for...
+                            <label>Search for...</label>
                             <span class="caret"></span>
                             <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("A Book", "Search", "Book")</li>
@@ -34,7 +35,6 @@
                             </ul>
                         </a>
                     </li>
-                    <li>@Html.ActionLink("Start a BookClub", "Create", "Club")</li>
                 </ul>
                 @Html.Partial("NavBarSearch", new BookSite.Models.ViewModels.NavBarSearchViewModel())
                 @Html.Partial("_LoginPartial")
