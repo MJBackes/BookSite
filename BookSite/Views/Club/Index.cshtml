@@ -73,7 +73,7 @@
                     }
                 </td>
                 <td>
-                    @discussion.Book.Title
+                    @Html.ActionLink(discussion.Book.Title, "Details", "Book", new { id = discussion.Book.GoogleVolumeId }, null)
                 </td>
                 <td>
                     @discussion.StartTime.Month/@discussion.StartTime.Day/@discussion.StartTime.Year
