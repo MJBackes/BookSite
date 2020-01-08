@@ -236,8 +236,8 @@ namespace BookSite.Controllers.SiteControllers
             var userId = User.Identity.GetUserId();
             viewModel.Members = db.ClubMembers.Include("Member").Where(cm => cm.ClubId == viewModel.Club.Id).Select(cm => cm.Member).ToList();
             Member user = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
-            Member manager = db.ClubMembers.Include("Member").FirstOrDefault(cm => cm.IsManager).Member;
-            viewModel.Members.First(m => m.Id == manager.Id).IsManager = true;
+            Member manager = db.ClubMembers.Include("Member").FirstOrDefault(cm => cm.ClubId == viewModel.Club.Id && cm.IsManager).Member;
+            viewModel.Members.FirstOrDefault(m => m.Id == manager.Id).IsManager = true;
             if (user.Id == manager.Id)
                 viewModel.IsManager = true;
         }
