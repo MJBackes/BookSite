@@ -40,6 +40,15 @@ button{
 .container .jumbotron{
     border-radius:0;
 }
+select{
+    color:black;
+}
+option{
+    color: black;
+}
+select label{
+    color:black;
+}
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
