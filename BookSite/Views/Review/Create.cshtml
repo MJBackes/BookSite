@@ -26,14 +26,14 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Rating, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.Rating, new SelectList(BookSite.Constants.ArraysForRatingSelectLists.RatingArray));
+                @Html.DropDownListFor(model => model.Rating, new SelectList(BookSite.Constants.ArraysForRatingSelectLists.RatingArray))
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.Body, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextAreaFor(model => model.Body, new { @class = "form-control", rows = "5", cols = "175", style = "height:auto; width:auto" })
+                @Html.TextAreaFor(model => model.Body, new { @class = "form-control", rows = "5", cols = "175", style = "height:auto; width:auto; max-width:80%" })
                 @Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
             </div>
         </div>

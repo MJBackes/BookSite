@@ -45,7 +45,7 @@ namespace BookSite.Controllers.SiteControllers
         {
             var userId = User.Identity.GetUserId();
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
-            if (id == member.Id)
+            if (member != null && id == member.Id)
                 return RedirectToAction("Index");
             MemberDetailsViewModel viewModel = BuildMemberDetailsViewModel(id, member);
             return View(viewModel);
@@ -105,7 +105,7 @@ namespace BookSite.Controllers.SiteControllers
         [HttpGet]
         public ActionResult AddBookToCollection(string id)
         {
-            return View(db.Books.FirstOrDefault(b => b.GoogleVolumeId == id));
+            return View(Utilities.GoogleBookSearchUtilities.ParseSingleSearchResponse(GoogleBooksAPIHandler.SingleSearch(id).Result));
         }
         [HttpPost]
         public ActionResult AddBookToCollection(Book book)
@@ -357,7 +357,7 @@ namespace BookSite.Controllers.SiteControllers
                 Books = books,
                 Reviews = reviews
             };
-            if (db.FriendPairs.FirstOrDefault(p => p.ListId == user.Id && p.FriendId == id) != null)
+            if (user != null && db.FriendPairs.FirstOrDefault(p => p.ListId == user.Id && p.FriendId == id) != null)
                 viewModel.isFriend = true;
             return viewModel;
         }

@@ -49,10 +49,11 @@ namespace BookSite.Utilities
         public static List<Book> ParseSearchResponse(GoogleBooksSearchResponse response)
         {
             List<Book> output = new List<Book>();
-            foreach (Item item in response.items)
-            {
-                output.Add(ParseSearchItem(item));
-            }
+            if(response.items != null)
+                foreach (Item item in response.items)
+                {
+                    output.Add(ParseSearchItem(item));
+                }
             return output;
         }
         public static Book ParseSearchItem(Item item)
@@ -105,7 +106,7 @@ namespace BookSite.Utilities
                 foreach (string s in categories)
                 {
                     GenreTag tag = db.GenreTags.FirstOrDefault(t => t.Name == s);
-                    db.BookTags.Add(new BookTags { Id = Guid.NewGuid(), BookId = book.Id, TagId = tag.Id });
+                    db.BookTags.Add(new BookTags { Id = Guid.NewGuid(), Book = book, GenreTag = tag });
                 }
                 db.SaveChanges();
             }

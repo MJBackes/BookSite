@@ -244,7 +244,7 @@ namespace BookSite.Controllers.SiteControllers
 
         private void AddDiscussionsToClubIndexViewModel(ClubIndexViewModel viewModel)
         {
-            viewModel.Discussions = db.Discussions.Where(d => d.ClubId == viewModel.Club.Id).ToList();
+            viewModel.Discussions = db.Discussions.Where(d => d.ClubId == viewModel.Club.Id).OrderByDescending(d => d.StartTime).ToList();
             foreach (Discussion discussion in viewModel.Discussions)
             {
                 BookDiscussions bookDiscussions = db.BookDiscussions.Include("Book").FirstOrDefault(bd => bd.DiscussionId == discussion.Id);

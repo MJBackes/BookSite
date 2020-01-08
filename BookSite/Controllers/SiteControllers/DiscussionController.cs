@@ -56,6 +56,7 @@ namespace BookSite.Controllers.SiteControllers
                     );
                 if ((Start - DateTime.Now).Ticks < 0)
                     return View(viewModel);
+                Book book = db.Books.Find(viewModel.Book.Id);
                 Discussion discussion = new Discussion
                 {
                     Id = Guid.NewGuid(),
@@ -67,11 +68,13 @@ namespace BookSite.Controllers.SiteControllers
                 BookDiscussions bookDiscussions = new BookDiscussions
                 {
                     Id = Guid.NewGuid(),
-                    Book = db.Books.Find(viewModel.Book.Id),
+                    Book = book,
                     Discussion = discussion
                 };
                 db.Discussions.Add(discussion);
                 db.BookDiscussions.Add(bookDiscussions);
+                BookClub club = db.BookClubs.Find(viewModel.ClubId);
+                club.NextBook = book;
                 db.SaveChanges();
                 return RedirectToAction("Index", "Club", new { id = viewModel.ClubId });
             }
