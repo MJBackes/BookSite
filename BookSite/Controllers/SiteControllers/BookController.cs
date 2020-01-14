@@ -90,17 +90,16 @@ namespace BookSite.Controllers.SiteControllers
                                                        .Select(cb => cb.Book))
                                                        .ToList();
             }
-            books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
+            return books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
                 {
                     Key = googleId,
                     Count = Books.Count(),
                     Value = Books.First()
                 }).OrderByDescending(g => g.Count)
                   .Select(g => g.Value)
-                  .Take(6)
+                  .SkipWhile(b => b.Id == book.Id)
+                  .Take(5)
                   .ToList();
-            books.Remove(book);
-            return books;
         }
     }
 }
