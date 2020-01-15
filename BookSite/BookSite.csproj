@@ -236,6 +236,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIHandlers\BookSiteAPIHandler.cs" />
     <Compile Include="APIHandlers\GoogleBooksAPIHandler.cs" />
     <Compile Include="APIKeys\APIKey.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -273,8 +274,6 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\MiscModels\MemberSearch.cs" />
-    <Compile Include="Models\SiteModels\FriendList.cs" />
-    <Compile Include="Models\SiteModels\FriendPair.cs" />
     <Compile Include="Models\ViewModels\BookDetailsViewModel.cs" />
     <Compile Include="Models\ViewModels\ClubIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\MemberDetailsViewModel.cs" />
@@ -284,20 +283,6 @@
     <Compile Include="Models\ViewModels\NewBookViewModel.cs" />
     <Compile Include="Models\MiscModels\Search.cs" />
     <Compile Include="Models\MiscModels\SimpleTextSearch.cs" />
-    <Compile Include="Models\SiteModels\Author.cs" />
-    <Compile Include="Models\SiteModels\Book.cs" />
-    <Compile Include="Models\SiteModels\BookAuthors.cs" />
-    <Compile Include="Models\SiteModels\BookClub.cs" />
-    <Compile Include="Models\SiteModels\BookDiscussions.cs" />
-    <Compile Include="Models\SiteModels\BookTags.cs" />
-    <Compile Include="Models\SiteModels\ClubMembers.cs" />
-    <Compile Include="Models\SiteModels\Collection.cs" />
-    <Compile Include="Models\SiteModels\CollectionBooks.cs" />
-    <Compile Include="Models\SiteModels\Comment.cs" />
-    <Compile Include="Models\SiteModels\Discussion.cs" />
-    <Compile Include="Models\SiteModels\GenreTag.cs" />
-    <Compile Include="Models\SiteModels\Member.cs" />
-    <Compile Include="Models\SiteModels\Review.cs" />
     <Compile Include="Models\ViewModels\NewDiscussionInputViewModel.cs" />
     <Compile Include="Models\ViewModels\NewDiscussionViewModel.cs" />
     <Compile Include="Models\ViewModels\RemoveFriendViewModel.cs" />
@@ -420,6 +405,12 @@
     <EmbeddedResource Include="Migrations\202001021607207_ThridMigration.resx">
       <DependentUpon>202001021607207_ThridMigration.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SiteModels\SiteModels.csproj">
+      <Project>{6ed3ec44-23ee-4d8c-aeae-ccbb3dff178c}</Project>
+      <Name>SiteModels</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -73,13 +73,13 @@ namespace BookSite.Controllers.SiteControllers
             BookDetailsViewModel viewModel = new BookDetailsViewModel();
             viewModel.Book = Utilities.GoogleBookSearchUtilities.ParseSingleSearchResponse(GoogleBooksAPIHandler.SingleSearch(id).Result);
             viewModel.Reviews = db.Reviews.Include("Member").Where(r => r.BookId == viewModel.Book.Id).ToList();
-            viewModel.RelatedBooks = GetRelatedBooks(viewModel.Book);
+            viewModel.RelatedBooks = GetRelatedBooks(viewModel.Book.Id);
             return viewModel;
         }
-        private List<Book> GetRelatedBooks(Book book)
+        private List<Book> GetRelatedBooks(Guid id)
         {
             List<Collection> collections = db.CollectionBooks.Include("Collection")
-                                                             .Where(cb => cb.BookId == book.Id)
+                                                             .Where(cb => cb.BookId == id)
                                                              .Select(cb => cb.Collection)
                                                              .ToList();
             List<Book> books = new List<Book>();
@@ -97,7 +97,7 @@ namespace BookSite.Controllers.SiteControllers
                     Value = Books.First()
                 }).OrderByDescending(g => g.Count)
                   .Select(g => g.Value)
-                  .SkipWhile(b => b.Id == book.Id)
+                  .SkipWhile(b => b.Id == id)
                   .Take(5)
                   .ToList();
         }
