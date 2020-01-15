@@ -78,29 +78,23 @@ namespace BookSite.Controllers.SiteControllers
         }
         private List<Book> GetRelatedBooks(Book book)
         {
-            List<Collection> collections = db.CollectionBooks.Include("Collection")
+            List<Guid> collectionIds = db.CollectionBooks.Include("Collection")
                                                              .Where(cb => cb.BookId == book.Id)
-                                                             .Select(cb => cb.Collection)
+                                                             .Select(cb => cb.Collection.Id)
                                                              .ToList();
-            List<Book> books = new List<Book>();
-            foreach(Collection c in collections)
-            {
-                books = books.Concat(db.CollectionBooks.Include("Book")
-                                                       .Where(cb => cb.CollectionId == c.Id && cb.Book.Thumbnail != null)
-                                                       .Select(cb => cb.Book))
-                                                       .ToList();
-            }
-            books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
-                {
-                    Key = googleId,
-                    Count = Books.Count(),
-                    Value = Books.First()
-                }).OrderByDescending(g => g.Count)
-                  .Select(g => g.Value)
-                  .Take(6)
-                  .ToList();
-            books.Remove(book);
-            return books;
+            return db.CollectionBooks.Include("Book")
+                                     .Where(cb => collectionIds.Contains(cb.CollectionId))
+                                     .Select(cb => cb.Book)
+                                     .GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new
+                                     {
+                                         Key = googleId,
+                                         Count = Books.Count(),
+                                         Value = Books.First()
+                                     }).OrderByDescending(g => g.Count)
+                                       .Select(g => g.Value)
+                                       .SkipWhile(b => b.Id == book.Id)
+                                       .Take(5)
+                                       .ToList();
         }
     }
 }

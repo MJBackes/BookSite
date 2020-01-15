@@ -240,40 +240,35 @@ namespace BookSite.Controllers.SiteControllers
 
         private List<Member> GetMembersFromClubs(List<BookClub> clubs)
         {
-            List<Member> output = new List<Member>();
-            foreach(BookClub club in clubs)
-            {
-                List<ClubMembers> clubMembers = db.ClubMembers.Where(cm => cm.ClubId == club.Id).ToList();
-                foreach (ClubMembers cm in clubMembers)
-                    output.Add(db.Members.Find(cm.MemberId));
-            }
-            return output.Distinct().ToList();
+            List<Guid> clubIds = clubs.Select(c => c.Id).ToList();
+            return db.ClubMembers.Include("Member")
+                                 .Where(cm => clubIds.Contains(cm.ClubId))
+                                 .Select(cm => cm.Member)
+                                 .Distinct()
+                                 .ToList();
         }
 
         private List<Member> GetMembersFromBooks(List<Book> books)
         {
-            List<Member> output = new List<Member>();
-            foreach(Book book in books)
-            {
-                List<CollectionBooks> collectionBooks = db.CollectionBooks.Include("Collection").Where(cb => cb.BookId == book.Id).ToList();
-                foreach(CollectionBooks cb in collectionBooks)
-                {
-                    output.Add(db.Members.Find(cb.Collection.MemberId));
-                }
-            }
-            return output.Distinct().ToList();
+            List<Guid> bookIds = books.Select(b => b.Id).ToList();
+            List<Guid> memberIds = db.CollectionBooks.Include("Collection")
+                                                     .Where(cb => bookIds.Contains(cb.BookId))
+                                                     .Select(cb => cb.Collection.MemberId)
+                                                     .ToList();
+            return db.Members.Where(m => memberIds.Contains(m.Id))
+                             .Distinct()
+                             .ToList();
         }
 
         private List<Member> GetMembersFromAuthors(List<Author> authors)
         {
-            List<Book> books = new List<Book>();
-            foreach(Author author in authors)
-            {
-                List<BookAuthors> bookAuthors = db.BookAuthors.Include("Book").Where(ba => ba.AuthorId == author.Id).ToList();
-                foreach (BookAuthors ba in bookAuthors)
-                    books.Add(ba.Book);
-            }
-            return GetMembersFromBooks(books.Distinct().ToList());
+            List<Guid> authorIds = authors.Select(a => a.Id).ToList();
+            List<Book> books = db.BookAuthors.Include("Book")
+                                             .Where(ba => authorIds.Contains(ba.AuthorId))
+                                             .Select(ba => ba.Book)
+                                             .Distinct()
+                                             .ToList();
+            return GetMembersFromBooks(books);
         }
 
         private List<Book> GetBookCollection(string userId)
@@ -370,35 +365,52 @@ namespace BookSite.Controllers.SiteControllers
                 friends = db.FriendPairs.Include("Friend").Where(p => p.ListId == friendList.Id).Select(p => p.Friend).ToList();
             return friends;
         }
-        private List<Book> GetFriendsBooks(List<Member> friends, Collection myCollection)
+        private List<Book> GetFriendsBooks(List<Member> friends, List<Book> myBooks)
         {
-            List<Book> books = new List<Book>();
-            foreach(Member friend in friends)
-            {
-                Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == friend.Id);
-                if(collection != null)
-                    books = books.Concat(db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == collection.Id && cb.Book.Thumbnail != null).Select(cb => cb.Book)).ToList();
-            }
-            books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
-                Key = googleId,
-                Count = Books.Count(),
-                Value = Books.First()
-            }).OrderByDescending(g => g.Count).Select(g => g.Value).ToList();
-            List<Book> output = new List<Book>();
-            List<Book> MyBooks = new List<Book>();
-            if(myCollection != null)
-                MyBooks = db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == myCollection.Id).Select(cb => cb.Book).ToList();
-            int index = 0;
-            while(output.Count < 5 && index < books.Count)
-            {
-                if (MyBooks.FirstOrDefault(b => b.GoogleVolumeId == books[index].GoogleVolumeId) == null)
-                {
-                    books[index].Authors = GetAuthorStringForBook(books[index]);
-                    output.Add(books[index]);
-                }
-                index++;
-            }
-            return output;
+            List<Guid> friendIds = friends.Select(m => m.Id).ToList();
+            List<Guid> myBookIds = myBooks.Select(b => b.Id).ToList();
+            return db.CollectionBooks.Include("Collection")
+                                                  .Include("Book")
+                                                  .Where(cb => friendIds.Contains(cb.Collection.MemberId))
+                                                  .Select(cb => cb.Book)
+                                                  .GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
+                                                      Key = googleId,
+                                                      Count = Books.Count(),
+                                                      Value = Books.First()
+                                                  })
+                                                  .OrderByDescending(g => g.Count)
+                                                  .Select(g => g.Value)
+                                                  .SkipWhile(b => myBookIds.Contains(b.Id))
+                                                  .Take(5)
+                                                  .ToList();
+
+            //List<Book> books = new List<Book>();
+            //foreach(Member friend in friends)
+            //{
+            //    Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == friend.Id);
+            //    if(collection != null)
+            //        books = books.Concat(db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == collection.Id && cb.Book.Thumbnail != null).Select(cb => cb.Book)).ToList();
+            //}
+            //books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
+            //    Key = googleId,
+            //    Count = Books.Count(),
+            //    Value = Books.First()
+            //}).OrderByDescending(g => g.Count).Select(g => g.Value).ToList();
+            //List<Book> output = new List<Book>();
+            //List<Book> MyBooks = new List<Book>();
+            //if(myCollection != null)
+            //    MyBooks = db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == myCollection.Id).Select(cb => cb.Book).ToList();
+            //int index = 0;
+            //while(output.Count < 5 && index < books.Count)
+            //{
+            //    if (MyBooks.FirstOrDefault(b => b.GoogleVolumeId == books[index].GoogleVolumeId) == null)
+            //    {
+            //        books[index].Authors = GetAuthorStringForBook(books[index]);
+            //        output.Add(books[index]);
+            //    }
+            //    index++;
+            //}
+            //return output;
         }
         private string GetAuthorStringForBook(Book book)
         {
@@ -536,7 +548,12 @@ namespace BookSite.Controllers.SiteControllers
             MemberIndexViewModel viewModel = new MemberIndexViewModel { MemberId = member.Id };
             viewModel.Clubs = GetBookClubs(member);
             viewModel.Friends = GetFriendsList(member);
-            viewModel.FriendsBooks = GetFriendsBooks(viewModel.Friends, db.Collections.FirstOrDefault(c => c.MemberId == member.Id));
+            List<Book> books = db.CollectionBooks.Include("Book")
+                                                 .Include("Collection")
+                                                 .Where(cb => cb.Collection.Member.Id == member.Id)
+                                                 .Select(cb => cb.Book)
+                                                 .ToList();
+            viewModel.FriendsBooks = GetFriendsBooks(viewModel.Friends, books);
             viewModel.Recommendations = GetRecommendations(member);
             viewModel.AuthorBooks = GetAuthorBooks(member);
             return viewModel;
