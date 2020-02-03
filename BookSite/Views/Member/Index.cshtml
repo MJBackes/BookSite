@@ -81,8 +81,8 @@
                     <div class="item @if (i == 0) {@Html.Raw("active")}">
                         <img class="bookThumbnail" style="margin-left:25%" src="@Model.Recommendations[i].Thumbnail" alt="@Model.Recommendations[i].Title">
                         <div class="carousel-caption">
-                            <h4 style="color: black">@Model.Recommendations[i].Title</h4>
-                            <h5 style="color:black">@Model.Recommendations[i].Authors</h5>
+                            <h4 style="color: aliceblue">@Model.Recommendations[i].Title</h4>
+                            <h5 style="color: aliceblue">@Model.Recommendations[i].Authors</h5>
                             @Html.ActionLink("Link", "Details", "Book", new { id = Model.Recommendations[i].GoogleVolumeId }, null)
                         </div>
                     </div>
@@ -110,8 +110,8 @@
                     <div style="text-align:center"class="item @if (i == 0) {@Html.Raw("active")}">
                         <img class="bookThumbnail" style="margin-left:25%" src="@Model.AuthorBooks[i].Thumbnail" alt="@Model.AuthorBooks[i].Title">
                         <div class="carousel-caption">
-                            <h4 style="color: black">@Model.AuthorBooks[i].Title</h4>
-                            <h5 style="color:black">@Model.AuthorBooks[i].Authors</h5>
+                            <h4 style="color: aliceblue">@Model.AuthorBooks[i].Title</h4>
+                            <h5 style="color: aliceblue">@Model.AuthorBooks[i].Authors</h5>
                             @Html.ActionLink("Link", "Details", "Book", new { id = Model.AuthorBooks[i].GoogleVolumeId }, null)
                         </div>
                     </div>
@@ -139,7 +139,7 @@
                     <div class="item @if (i == 0) {@Html.Raw("active")}">
                         <img class="bookThumbnail" style="margin-left:25%" src="@Model.FriendsBooks[i].Thumbnail" alt="@Model.FriendsBooks[i].Title">
                         <div class="carousel-caption">
-                            <h4 style="color: black">@Model.FriendsBooks[i].Title</h4>
+                            <h4 style="color: aliceblue">@Model.FriendsBooks[i].Title</h4>
                             @Html.ActionLink("Link", "Details", "Book", new { id = Model.FriendsBooks[i].GoogleVolumeId }, null)
                         </div>
                     </div>

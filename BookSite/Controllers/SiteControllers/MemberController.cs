@@ -282,8 +282,8 @@ namespace BookSite.Controllers.SiteControllers
                                           .Where(cb => cb.CollectionId == collection.Id)
                                           .Select(cb => cb.Book)
                                           .ToList();
-                foreach (Book book in books)
-                    book.Authors = GetAuthorStringForBook(book);
+                for(int i = 0; i < books.Count; i++)
+                    books[i] = GetBookWithAuthorAndCategory(books[i]);
             }
             return books;
         }
@@ -376,41 +376,14 @@ namespace BookSite.Controllers.SiteControllers
                                                   .GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
                                                       Key = googleId,
                                                       Count = Books.Count(),
-                                                      Value = Books.First()
+                                                      Value = Books.FirstOrDefault()
                                                   })
                                                   .OrderByDescending(g => g.Count)
                                                   .Select(g => g.Value)
+                                                  .AsEnumerable()
                                                   .SkipWhile(b => myBookIds.Contains(b.Id))
                                                   .Take(5)
                                                   .ToList();
-
-            //List<Book> books = new List<Book>();
-            //foreach(Member friend in friends)
-            //{
-            //    Collection collection = db.Collections.FirstOrDefault(c => c.MemberId == friend.Id);
-            //    if(collection != null)
-            //        books = books.Concat(db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == collection.Id && cb.Book.Thumbnail != null).Select(cb => cb.Book)).ToList();
-            //}
-            //books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
-            //    Key = googleId,
-            //    Count = Books.Count(),
-            //    Value = Books.First()
-            //}).OrderByDescending(g => g.Count).Select(g => g.Value).ToList();
-            //List<Book> output = new List<Book>();
-            //List<Book> MyBooks = new List<Book>();
-            //if(myCollection != null)
-            //    MyBooks = db.CollectionBooks.Include("Book").Where(cb => cb.CollectionId == myCollection.Id).Select(cb => cb.Book).ToList();
-            //int index = 0;
-            //while(output.Count < 5 && index < books.Count)
-            //{
-            //    if (MyBooks.FirstOrDefault(b => b.GoogleVolumeId == books[index].GoogleVolumeId) == null)
-            //    {
-            //        books[index].Authors = GetAuthorStringForBook(books[index]);
-            //        output.Add(books[index]);
-            //    }
-            //    index++;
-            //}
-            //return output;
         }
         private string GetAuthorStringForBook(Book book)
         {
@@ -456,7 +429,7 @@ namespace BookSite.Controllers.SiteControllers
             {
                 Key = googleId,
                 Count = books.Count(),
-                Value = books.First()
+                Value = books.FirstOrDefault()
             }).OrderByDescending(g => g.Count)
               .Select(g => g.Value)
               .ToList();
@@ -503,7 +476,7 @@ namespace BookSite.Controllers.SiteControllers
             {
                 Key = id,
                 Count = Authors.Count(),
-                Value = Authors.First()
+                Value = Authors.FirstOrDefault()
             }).Select(g => g.Value).ToList();
         }
         private List<Book> GetRelatedBooks(Book book)
@@ -524,7 +497,7 @@ namespace BookSite.Controllers.SiteControllers
             {
                 Key = googleId,
                 Count = Books.Count(),
-                Value = Books.First()
+                Value = Books.FirstOrDefault()
             }).OrderByDescending(g => g.Count)
                   .Select(g => g.Value)
                   .Take(6)

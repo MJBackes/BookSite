@@ -258,7 +258,7 @@ namespace BookSite.Controllers.SiteControllers
             viewModel.Books = books.GroupBy(b => b.GoogleVolumeId, (googleId, Books) => new {
                 Count = Books.Count(),
                 Key = googleId,
-                Value = Books.First()
+                Value = Books.FirstOrDefault()
             }).OrderByDescending(g => g.Count).Select(g => g.Value).ToList();
         }
 
@@ -271,9 +271,9 @@ namespace BookSite.Controllers.SiteControllers
                 if (collection != null)
                 {
                     books = books.Concat(db.CollectionBooks.Include("Book")
-                                                                   .Where(cb => cb.CollectionId == collection.Id && cb.Book.Thumbnail != null)
-                                                                   .Select(cb => cb.Book))
-                                                                   .ToList();
+                                                           .Where(cb => cb.CollectionId == collection.Id && cb.Book.Thumbnail != null)
+                                                           .Select(cb => cb.Book))
+                                                           .ToList();
                 }
             }
             return books;

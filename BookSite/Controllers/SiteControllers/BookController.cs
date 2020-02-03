@@ -89,9 +89,10 @@ namespace BookSite.Controllers.SiteControllers
                                      {
                                          Key = googleId,
                                          Count = Books.Count(),
-                                         Value = Books.First()
+                                         Value = Books.FirstOrDefault()
                                      }).OrderByDescending(g => g.Count)
                                        .Select(g => g.Value)
+                                       .AsEnumerable()
                                        .SkipWhile(b => b.Id == book.Id)
                                        .Take(5)
                                        .ToList();

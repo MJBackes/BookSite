@@ -33,10 +33,17 @@
                 <img src="@item.Thumbnail" />
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Title)
+                @Html.ActionLink(item.Title, "Details", "Book", new { id = item.GoogleVolumeId }, null)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Authors)
+                @if (item.Authors != null && item.Authors.Length > 0)
+                {
+                    @Html.ActionLink(item.Authors, "AuthorSearch", "Book", new { InAuthor = item.Authors }, null)
+                }
+                else
+                {
+                    @Html.Raw("Unknown")
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Categories)

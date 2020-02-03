@@ -1,8 +1,24 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "BookSite";
 }
         <div class="jumbotron">
             <h1>BookSite</h1>
             <p>A site for books.</p>
             @Html.ActionLink("Get Started", "Register", "Account", null, new { @class = "btn btn-success"})
         </div>
+<style>
+    .body-content .container{
+        margin:0;
+        padding:0;
+    }
+    .body-content {
+    padding-left: 0px;
+    padding-right: 0px;
+    margin:0;
+}
+    .jumbotron{
+        width: 100vw;
+        padding:15px;
+        margin:0%;
+    }
+</style>
