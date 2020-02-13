@@ -192,7 +192,7 @@ namespace BookSite.Controllers.SiteControllers
         private ViewDiscussionViewModel GetViewDiscussionViewModel(string userId, Guid id)
         {
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
-            Discussion discussion = db.Discussions.FirstOrDefault(d => d.Id == id);
+            Discussion discussion = db.Discussions.Include("BookClub").FirstOrDefault(d => d.Id == id);
             Book book = db.BookDiscussions.Include("Book").FirstOrDefault(bd => bd.DiscussionId == discussion.Id).Book;
             List<Comment> comments = db.Comments.Include("Member").Where(c => c.DiscussionId == discussion.Id).OrderBy(c => c.TimeOfPost).ToList();
             ViewDiscussionViewModel viewModel = new ViewDiscussionViewModel

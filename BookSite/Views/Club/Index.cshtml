@@ -6,7 +6,7 @@
 <h2>@Model.Club.Name</h2>
 @if (Model.IsManager)
 {
-    @Html.ActionLink("Choose Next Book", "NewBookSearch", "Club", new { clubId = Model.Club.Id }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Choose Next Book", "NewBookSearch", "Club", new { clubId = Model.Club.Id }, new { @class = "btn btn-success" })
     @Html.ActionLink("Edit Club", "Edit", "Club", new { id = Model.Club.Id }, null)
 }
 <h3>Members</h3>
@@ -88,7 +88,7 @@
                     }
                 </td>
                 <td>
-                    @if ((discussion.StartTime - DateTime.Now).TotalMinutes < 5 && !discussion.HasStarted)
+                    @if ((discussion.StartTime - DateTime.Now).TotalMinutes < 5 && !discussion.HasStarted && Model.IsManager)
                     {
                         @Html.ActionLink("Start", "GoLive", "Discussion", new { id = discussion.Id }, new { @class = "btn btn-success" })
                     }
@@ -122,7 +122,7 @@
                 <div class="item @if (i == 0) {@Html.Raw("active")}">
                     <img class="bookThumbnail" style="margin-left:25%" src="@Model.Books[i].Thumbnail" alt="@Model.Books[i].Title">
                     <div class="carousel-caption">
-                        <h4 style="color: black">@Model.Books[i].Title</h4>
+                        <h4 style="color: aliceblue">@Model.Books[i].Title</h4>
                         @Html.ActionLink("Link", "Details", "Book", new { id = Model.Books[i].GoogleVolumeId }, null)
                     </div>
                 </div>

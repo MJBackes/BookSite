@@ -30,7 +30,7 @@ namespace BookSite.Controllers.SiteControllers
             if (userId == null)
                 return RedirectToAction("Login", "Account");
             Member member = db.Members.FirstOrDefault(m => m.ApplicationUserId == userId);
-            if (member.Id == default)
+            if (member == null || member.Id == default)
                 return RedirectToAction("Create");
             if (member != null)
             {

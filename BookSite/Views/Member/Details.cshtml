@@ -1,7 +1,7 @@
 ﻿@model BookSite.Models.ViewModels.MemberDetailsViewModel
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = Model.Member.DisplayName;
 }
 
 <h2>Member Details</h2>
@@ -69,7 +69,7 @@
                         <div class="card-body">
                             <h4 class="card-title">@Model.Reviews[i].Title</h4>
                             <p class="card-text">@Model.Reviews[i].Body</p>
-                            @Html.ActionLink("To Book", "Details", "Book", new { id = Model.Reviews[i].Book.Id }, new { @class = "btn btn-primary" })
+                            @Html.ActionLink("To Book", "Details", "Book", new { id = Model.Reviews[i].Book.GoogleVolumeId }, new { @class = "btn btn-primary" })
                         </div>
                     </div>
                     <div class="col-md-8">

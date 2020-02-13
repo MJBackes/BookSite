@@ -1,7 +1,7 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
-    background-color:#666666;
+    background-color:#1e1e1e;
 }
 a {
     color:aliceblue;
@@ -12,12 +12,15 @@ label{
 h2,h3,h4,h5{
     color:aliceblue;
 }
+.navbar{
+    margin-bottom: 5px;
+}
 .navbar-inverse {
     background-color: #404040;
 }
-    .navbar-inverse .navbar-brand {
+.navbar-inverse .navbar-brand {
         color: aliceblue;
-    }
+}
 .nav-link{
     color:aliceblue;
 }
@@ -51,6 +54,10 @@ select label{
 }
 .carousel{
     border-radius: 5px;
+}
+.carousel-caption {
+    width:25%; 
+    margin-left:20%
 }
 /* Set padding to keep content from hitting the edges */
 .body-content {

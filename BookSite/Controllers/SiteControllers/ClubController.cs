@@ -34,7 +34,7 @@ namespace BookSite.Controllers.SiteControllers
         // GET: Club/Details/5
         public ActionResult Details(Guid? id)
         {
-            return View(db.BookClubs.Find(id));
+            return View(db.BookClubs.Include("NextBook").FirstOrDefault(c => c.Id == id));
         }
 
         // GET: Club/Create
@@ -172,7 +172,7 @@ namespace BookSite.Controllers.SiteControllers
                 foreach (string s in inputArray)
                 {
                     List<BookClub> matchingClubs = db.BookClubs.Include("NextBook").Where(c => (c.Name.Contains(s.Trim()) || c.Description.Contains(s.Trim())) && c.PrivacyLevel == "Public").ToList();
-                    clubs = clubs.Concat(matchingClubs).ToList();
+                    clubs = clubs.Concat(matchingClubs).Distinct().ToList();
                 }
                 return View("SearchResults", clubs);
             }

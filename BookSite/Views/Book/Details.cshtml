@@ -70,7 +70,7 @@
                 <div class="item @if (i == 0) {@Html.Raw("active")}">
                     <img class="bookThumbnail" style="margin-left:25%; display:block" src="@Model.RelatedBooks[i].Thumbnail" alt="@Model.RelatedBooks[i].Title">
                     <div class="carousel-caption">
-                        <h4 style="color: black">@Model.RelatedBooks[i].Title</h4>
+                        <h4 style="color: aliceblue">@Model.RelatedBooks[i].Title</h4>
                         @Html.ActionLink("Link", "Details", "Book", new { id = Model.RelatedBooks[i].GoogleVolumeId }, null)
                     </div>
                 </div>

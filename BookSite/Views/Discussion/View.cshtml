@@ -3,7 +3,7 @@
     ViewBag.Title = Model.Discussion.Name;
 }
 
-<h2>@Model.Discussion.Name</h2>
+<h2>@Html.ActionLink(Model.Discussion.BookClub.Name, "Index", "Club", new { id = Model.Discussion.ClubId }, null) > @Model.Discussion.Name</h2>
     <center>
         <img src="@Model.Book.Thumbnail"/>
     </center>

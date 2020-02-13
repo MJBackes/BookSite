@@ -7,6 +7,7 @@
 <h2>SearchResults</h2>
 <table class="table">
     <tr>
+        <th></th>
         <th class="col-md-5">
             @Html.DisplayNameFor(model => model.DisplayName)
         </th>
@@ -15,6 +16,9 @@
 
 @foreach (var item in Model) {
     <tr>
+        <td>
+            <img src="@item.UserImage" style="width:100px; height:100px"/>
+        </td>
         <td>
             @Html.DisplayFor(modelItem => item.DisplayName)
         </td>
